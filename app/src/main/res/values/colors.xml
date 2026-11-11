@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Bảng màu lấy từ Figma "Tiu Design System" (frame Tiu · Style) -->
+<resources>
+    <!-- Màu thương hiệu -->
+    <color name="tiu_orange">#F07D45</color>          <!-- Tiu/Brand/Primary – Cam hành động -->
+    <color name="tiu_orange_pastel">#FFB780</color>   <!-- Tiu/Brand/Secondary – Cam pastel -->
+    <color name="tiu_ink">#4A3427</color>             <!-- Tiu/Brand/Ink – Nâu nét doodle -->
+    <color name="tiu_peach">#FBD9BC</color>           <!-- Tiu/Brand/Peach – Đào nhạt -->
+    <!-- Nền & trung tính -->
+    <color name="tiu_paper">#FFF7E8</color>           <!-- Tiu/Neutral/Background – Nền giấy -->
+    <color name="tiu_card">#FFFDF7</color>            <!-- Tiu/Neutral/Surface – Card kem -->
+    <color name="tiu_text_secondary">#806B5D</color>  <!-- Tiu/Neutral/Text secondary -->
+    <!-- Trạng thái & dữ liệu -->
+    <color name="tiu_income">#83C69B</color>
+    <color name="tiu_expense">#E96F62</color>
+    <color name="tiu_warning_bg">#FDE3DF</color>
+    <color name="tiu_success_bg">#E5F4EA</color>
+    <color name="tiu_track">#FFE7D1</color>
+    <color name="white">#FFFFFF</color>
+</resources>

@@ -1,0 +1,262 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Form Thêm/Sửa giao dịch – bám màn "Thêm khoản chi" trong Figma -->
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tiu_paper"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <LinearLayout
+            style="@style/Widget.Tiu.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical">
+
+            <!-- Tiêu đề + nút đóng -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:id="@+id/textEyebrow"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Giao dịch"
+                        android:textAppearance="@style/TextAppearance.Tiu.Eyebrow" />
+
+                    <TextView
+                        android:id="@+id/textTitle"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:textAppearance="@style/TextAppearance.Tiu.H2"
+                        tools:text="Thêm khoản chi" />
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/btnClose"
+                    style="@style/Widget.Tiu.CircleButton"
+                    android:layout_width="44dp"
+                    android:layout_height="44dp"
+                    android:contentDescription="Đóng"
+                    android:src="@drawable/ic_close" />
+            </LinearLayout>
+
+            <!-- Toggle Chi tiêu / Thu nhập -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_doodle_input"
+                android:orientation="horizontal"
+                android:padding="5dp"
+                android:paddingEnd="8dp"
+                android:paddingBottom="8dp">
+
+                <TextView
+                    android:id="@+id/toggleExpense"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/label_expense"
+                    android:textColor="@color/tiu_ink"
+                    android:textStyle="bold" />
+
+                <TextView
+                    android:id="@+id/toggleIncome"
+                    android:layout_width="0dp"
+                    android:layout_height="40dp"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="@string/label_income"
+                    android:textColor="@color/tiu_ink"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <!-- Số tiền -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/label_amount"
+                android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+            <EditText
+                android:id="@+id/inputAmount"
+                style="@style/Widget.Tiu.Input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="0 ₫"
+                android:importantForAutofill="no"
+                android:inputType="number"
+                android:maxLength="17"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <TextView
+                android:id="@+id/errorAmount"
+                style="@style/TextAppearance.Tiu.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/tiu_expense"
+                android:visibility="gone" />
+
+            <!-- Danh mục + Ngày -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:baselineAligned="false"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:text="@string/label_category"
+                        android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+                    <TextView
+                        android:id="@+id/fieldCategory"
+                        style="@style/Widget.Tiu.Input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:drawablePadding="4dp"
+                        android:ellipsize="end"
+                        android:focusable="true"
+                        android:hint="@string/choose_category"
+                        android:maxLines="1"
+                        app:drawableEndCompat="@drawable/ic_arrow_drop_down"
+                        app:drawableTint="@color/tiu_ink" />
+
+                    <TextView
+                        android:id="@+id/errorCategory"
+                        style="@style/TextAppearance.Tiu.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/tiu_expense"
+                        android:visibility="gone" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="6dp"
+                        android:text="@string/label_date"
+                        android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+                    <TextView
+                        android:id="@+id/fieldDate"
+                        style="@style/Widget.Tiu.Input"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:clickable="true"
+                        android:drawablePadding="4dp"
+                        android:focusable="true"
+                        android:maxLines="1"
+                        app:drawableEndCompat="@drawable/ic_calendar"
+                        app:drawableTint="@color/tiu_ink"
+                        tools:text="Hôm nay, 03/11" />
+
+                    <TextView
+                        android:id="@+id/errorDate"
+                        style="@style/TextAppearance.Tiu.Caption"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:textColor="@color/tiu_expense"
+                        android:visibility="gone" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Ghi chú -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/label_note"
+                android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+            <EditText
+                android:id="@+id/inputNote"
+                style="@style/Widget.Tiu.Input"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:hint="@string/hint_note"
+                android:importantForAutofill="no"
+                android:inputType="textCapSentences|textMultiLine"
+                android:maxLength="200" />
+
+            <TextView
+                android:id="@+id/errorNote"
+                style="@style/TextAppearance.Tiu.Caption"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:textColor="@color/tiu_expense"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/btnSave"
+                style="@style/Widget.Tiu.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="22dp"
+                android:text="@string/action_save" />
+
+            <TextView
+                android:id="@+id/btnDelete"
+                style="@style/Widget.Tiu.Button.Ghost"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:text="@string/action_delete"
+                android:textColor="@color/tiu_expense"
+                android:visibility="gone" />
+
+            <ProgressBar
+                android:id="@+id/progress"
+                android:layout_width="28dp"
+                android:layout_height="28dp"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="12dp"
+                android:indeterminateTint="@color/tiu_orange"
+                android:visibility="gone" />
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,72 @@
+rules_version = '2';
+
+// Security Rules cho Tiu – mỗi người chỉ đọc/ghi được dữ liệu của chính mình.
+// Deploy: firebase deploy --only firestore:rules
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() { return request.auth != null; }
+    function isOwner(uid) { return signedIn() && request.auth.uid == uid; }
+    function isType(t) { return t in ['EXPENSE', 'INCOME']; }
+
+    function validTransaction(d) {
+      return d.amount is int && d.amount > 0 && d.amount <= 1000000000
+        && isType(d.type)
+        && d.categoryId is string && d.categoryId.size() > 0
+        && d.categoryName is string
+        && d.note is string && d.note.size() <= 200
+        && d.date is timestamp;
+    }
+
+    function validCategory(d) {
+      return d.name is string && d.name.size() > 0 && d.name.size() <= 30
+        && isType(d.type);
+    }
+
+    function validBudget(d) {
+      return d.limitAmount is int && d.limitAmount > 0
+        && d.month is string && d.month.matches('^[0-9]{4}-[0-9]{2}$')
+        && (d.categoryId == null || d.categoryId is string);
+    }
+
+    // ---------- USER ----------
+    match /users/{uid} {
+      allow read, create, update: if isOwner(uid);
+      allow delete: if false;
+
+      match /transactions/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validTransaction(request.resource.data);
+      }
+
+      match /categories/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validCategory(request.resource.data);
+      }
+
+      match /budgets/{id} {
+        allow read, delete: if isOwner(uid);
+        allow create, update: if isOwner(uid) && validBudget(request.resource.data);
+      }
+
+      // Thông báo, giao dịch định kỳ (tuần 4–5)
+      match /notifications/{id} { allow read, write: if isOwner(uid); }
+      match /recurring/{id} { allow read, write: if isOwner(uid); }
+    }
+
+    // ---------- FRIENDSHIP (collection gốc) ----------
+    match /friendships/{id} {
+      allow read: if signedIn()
+        && request.auth.uid in [resource.data.requesterId, resource.data.addresseeId];
+      allow create: if signedIn()
+        && request.resource.data.requesterId == request.auth.uid
+        && request.resource.data.status == 'PENDING';
+      // Chỉ người nhận lời mời được chấp nhận
+      allow update: if signedIn()
+        && resource.data.addresseeId == request.auth.uid
+        && request.resource.data.status == 'ACCEPTED';
+      allow delete: if signedIn()
+        && request.auth.uid in [resource.data.requesterId, resource.data.addresseeId];
+    }
+  }
+}

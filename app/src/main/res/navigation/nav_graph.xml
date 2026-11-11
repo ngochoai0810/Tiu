@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- startDestination được MainActivity đặt lại: đã đăng nhập -> homeFragment, chưa -> loginFragment -->
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/loginFragment">
+
+    <fragment
+        android:id="@+id/loginFragment"
+        android:name="vn.edu.dut.tiu.ui.auth.LoginFragment"
+        android:label="Đăng nhập" />
+
+    <fragment
+        android:id="@+id/registerFragment"
+        android:name="vn.edu.dut.tiu.ui.auth.RegisterFragment"
+        android:label="Đăng ký" />
+
+    <fragment
+        android:id="@+id/homeFragment"
+        android:name="vn.edu.dut.tiu.ui.home.HomeFragment"
+        android:label="@string/nav_home" />
+
+    <fragment
+        android:id="@+id/transactionEditorFragment"
+        android:name="vn.edu.dut.tiu.ui.transaction.TransactionEditorFragment"
+        android:label="Giao dịch">
+        <argument
+            android:name="transactionId"
+            android:defaultValue="@null"
+            app:argType="string"
+            app:nullable="true" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/statsFragment"
+        android:name="vn.edu.dut.tiu.ui.common.PlaceholderFragment"
+        android:label="@string/nav_stats">
+        <argument android:name="title" android:defaultValue="@string/placeholder_stats_title" app:argType="reference" />
+        <argument android:name="body" android:defaultValue="@string/placeholder_stats_body" app:argType="reference" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/cameraFragment"
+        android:name="vn.edu.dut.tiu.ui.common.PlaceholderFragment"
+        android:label="@string/nav_camera">
+        <argument android:name="title" android:defaultValue="@string/placeholder_camera_title" app:argType="reference" />
+        <argument android:name="body" android:defaultValue="@string/placeholder_camera_body" app:argType="reference" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/budgetFragment"
+        android:name="vn.edu.dut.tiu.ui.budget.BudgetFragment"
+        android:label="@string/nav_budget" />
+
+    <fragment
+        android:id="@+id/accountFragment"
+        android:name="vn.edu.dut.tiu.ui.account.AccountFragment"
+        android:label="@string/nav_account" />
+
+    <fragment
+        android:id="@+id/categoryFragment"
+        android:name="vn.edu.dut.tiu.ui.category.CategoryFragment"
+        android:label="Danh mục" />
+
+</navigation>

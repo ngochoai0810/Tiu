@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">tiu</string>
+
+    <string name="nav_home">Nhật ký</string>
+    <string name="nav_stats">Thống kê</string>
+    <string name="nav_camera">Chụp ảnh</string>
+    <string name="nav_budget">Ngân sách</string>
+    <string name="nav_account">Tài khoản</string>
+
+    <string name="login_eyebrow">Chào bạn quay lại</string>
+    <string name="login_title">Đăng nhập vào tiu</string>
+    <string name="register_eyebrow">Bắt đầu ghi chép</string>
+    <string name="register_title">Tạo tài khoản tiu</string>
+    <string name="hint_name">Tên hiển thị</string>
+    <string name="hint_email">Email</string>
+    <string name="hint_password">Mật khẩu</string>
+    <string name="hint_password_confirm">Nhập lại mật khẩu</string>
+    <string name="action_login">Đăng nhập</string>
+    <string name="action_register">Đăng ký</string>
+    <string name="to_register">Chưa có tài khoản? Đăng ký</string>
+    <string name="to_login">Đã có tài khoản? Đăng nhập</string>
+
+    <string name="home_eyebrow">Nhật ký chi tiêu</string>
+    <string name="label_expense">Chi tiêu</string>
+    <string name="label_income">Thu nhập</string>
+    <string name="label_balance">Số dư</string>
+    <string name="home_empty">Chưa có khoản nào trong tháng này.\nBấm + để ghi khoản đầu tiên nhé.</string>
+
+    <string name="editor_add_title">Thêm khoản chi</string>
+    <string name="editor_edit_title">Sửa giao dịch</string>
+    <string name="label_amount">Số tiền</string>
+    <string name="label_category">Danh mục</string>
+    <string name="label_date">Ngày</string>
+    <string name="label_note">Ghi chú</string>
+    <string name="hint_note">Thêm một dòng kỷ niệm…</string>
+    <string name="action_save">Lưu vào nhật ký</string>
+    <string name="action_delete">Xóa giao dịch</string>
+    <string name="choose_category">Chọn danh mục</string>
+
+    <string name="delete_tx_title">Xóa giao dịch này?</string>
+    <string name="delete_tx_message">Khoản %1$s (%2$s) sẽ bị xóa vĩnh viễn.</string>
+    <string name="action_cancel">Hủy</string>
+    <string name="action_confirm_delete">Xóa</string>
+
+    <string name="budget_eyebrow">Ngân sách</string>
+    <string name="budget_title">Giữ nhịp chi tiêu</string>
+    <string name="budget_used">Đã dùng</string>
+    <string name="budget_add_category">+ Tạo ngân sách danh mục</string>
+    <string name="budget_no_total">Chưa đặt ngân sách tháng. Chạm để tạo.</string>
+    <string name="budget_dialog_total">Ngân sách cả tháng</string>
+    <string name="budget_dialog_category">Ngân sách danh mục</string>
+    <string name="budget_hint_amount">Hạn mức, ví dụ 3.000.000</string>
+    <string name="action_ok">Lưu</string>
+    <string name="action_remove">Xóa ngân sách</string>
+
+    <string name="category_eyebrow">Danh mục</string>
+    <string name="category_title">Phân loại khoản thu chi</string>
+    <string name="category_add">+ Thêm danh mục</string>
+    <string name="category_dialog_add">Danh mục mới</string>
+    <string name="category_dialog_edit">Sửa danh mục</string>
+    <string name="category_hint_name">Tên danh mục</string>
+    <string name="category_hint_icon">Biểu tượng (emoji), ví dụ ☕</string>
+    <string name="category_delete">Xóa danh mục</string>
+    <string name="category_default_badge">Mặc định</string>
+
+    <string name="account_eyebrow">Hồ sơ</string>
+    <string name="account_manage_categories">Quản lý danh mục</string>
+    <string name="account_logout">Đăng xuất</string>
+
+    <string name="placeholder_stats_title">Thống kê</string>
+    <string name="placeholder_stats_body">Biểu đồ theo danh mục sẽ có ở Tuần 4.</string>
+    <string name="placeholder_camera_title">Chụp khoản chi</string>
+    <string name="placeholder_camera_body">Chụp ảnh và OCR hóa đơn sẽ có ở Tuần 3–5 (phần của Hoài).</string>
+</resources>

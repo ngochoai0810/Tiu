@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- id trùng với id destination trong nav_graph để NavigationUI tự điều hướng -->
+<menu xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:id="@+id/homeFragment" android:icon="@drawable/ic_grid" android:title="@string/nav_home" />
+    <item android:id="@+id/statsFragment" android:icon="@drawable/ic_chart" android:title="@string/nav_stats" />
+    <item android:id="@+id/cameraFragment" android:icon="@drawable/ic_camera" android:title="@string/nav_camera" />
+    <item android:id="@+id/budgetFragment" android:icon="@drawable/ic_wallet" android:title="@string/nav_budget" />
+    <item android:id="@+id/accountFragment" android:icon="@drawable/ic_person" android:title="@string/nav_account" />
+</menu>

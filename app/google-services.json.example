@@ -1,0 +1,20 @@
+{
+  "_ghi_chu": "Tải file google-services.json THẬT từ Firebase Console (Project settings > Your apps > Android, package vn.edu.dut.tiu) và đặt vào app/google-services.json. File này chỉ là mẫu.",
+  "project_info": {
+    "project_number": "000000000000",
+    "project_id": "tiu-placeholder",
+    "storage_bucket": "tiu-placeholder.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:000000000000:android:0000000000000000",
+        "android_client_info": { "package_name": "vn.edu.dut.tiu" }
+      },
+      "oauth_client": [],
+      "api_key": [ { "current_key": "PLACEHOLDER_API_KEY" } ],
+      "services": { "appinvite_service": { "other_platform_oauth_client": [] } }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tiu_paper">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        android:padding="20dp">
+
+        <TextView
+            android:id="@+id/textAvatar"
+            android:layout_width="96dp"
+            android:layout_height="96dp"
+            android:layout_marginTop="24dp"
+            android:background="@drawable/bg_avatar"
+            android:gravity="center"
+            android:paddingEnd="3dp"
+            android:paddingBottom="3dp"
+            android:textColor="@color/tiu_ink"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            tools:text="AN" />
+
+        <TextView
+            android:id="@+id/textName"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:textAppearance="@style/TextAppearance.Tiu.H2"
+            tools:text="An Nguyễn" />
+
+        <TextView
+            android:id="@+id/textEmail"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="2dp"
+            android:textAppearance="@style/TextAppearance.Tiu.Caption"
+            tools:text="an@sv1.dut.udn.vn" />
+
+        <TextView
+            android:id="@+id/btnCategories"
+            style="@style/Widget.Tiu.Button.Ghost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="32dp"
+            android:text="@string/account_manage_categories" />
+
+        <TextView
+            android:id="@+id/btnLogout"
+            style="@style/Widget.Tiu.Button.Ghost"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="@string/account_logout"
+            android:textColor="@color/tiu_expense" />
+    </LinearLayout>
+</ScrollView>

@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Màn Ngân sách – bám frame "Quản lý ngân sách" trong Figma -->
+<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tiu_paper">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:paddingBottom="24dp">
+
+        <include
+            android:id="@+id/topBar"
+            layout="@layout/layout_top_bar" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="12dp"
+            android:text="@string/budget_eyebrow"
+            android:textAppearance="@style/TextAppearance.Tiu.Eyebrow" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:text="@string/budget_title"
+            android:textAppearance="@style/TextAppearance.Tiu.H1" />
+
+        <TextView
+            android:id="@+id/textMonthInfo"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="24dp"
+            android:layout_marginTop="2dp"
+            android:textAppearance="@style/TextAppearance.Tiu.Caption"
+            tools:text="Tháng 6 · còn 17 ngày" />
+
+        <!-- Thẻ tổng: % đã dùng -->
+        <LinearLayout
+            android:id="@+id/cardTotal"
+            style="@style/Widget.Tiu.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="20dp"
+            android:background="@drawable/bg_doodle_card_orange"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?attr/selectableItemBackground"
+            android:orientation="vertical"
+            android:paddingTop="18dp"
+            android:paddingBottom="22dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="@string/budget_used"
+                android:textAppearance="@style/TextAppearance.Tiu.Eyebrow" />
+
+            <TextView
+                android:id="@+id/textPercent"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:textAppearance="@style/TextAppearance.Tiu.Display"
+                tools:text="43%" />
+
+            <com.google.android.material.progressindicator.LinearProgressIndicator
+                android:id="@+id/progressTotal"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:max="100"
+                app:indicatorColor="@color/tiu_card"
+                app:trackColor="#66FFFDF7"
+                app:trackCornerRadius="6dp"
+                app:trackThickness="8dp" />
+
+            <TextView
+                android:id="@+id/textTotalAmounts"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:textAppearance="@style/TextAppearance.Tiu.Caption"
+                android:textColor="@color/tiu_ink"
+                tools:text="1.284.000 ₫ / 3.000.000 ₫" />
+
+            <TextView
+                android:id="@+id/textDaily"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="2dp"
+                android:textAppearance="@style/TextAppearance.Tiu.Caption"
+                android:textColor="@color/tiu_ink"
+                tools:text="Mỗi ngày còn được tiêu ~100.941 ₫" />
+        </LinearLayout>
+
+        <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/recycler"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="16dp"
+            android:nestedScrollingEnabled="false"
+            android:paddingHorizontal="20dp" />
+
+        <TextView
+            android:id="@+id/btnAddCategoryBudget"
+            style="@style/Widget.Tiu.Button.Dashed"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginTop="8dp"
+            android:text="@string/budget_add_category" />
+    </LinearLayout>
+</androidx.core.widget.NestedScrollView>
