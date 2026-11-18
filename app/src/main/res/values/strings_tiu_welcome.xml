@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tiu_welcome_eyebrow">TIU · NHẬT KÝ CHI TIÊU</string>
+    <string name="tiu_welcome_title">Chụp một tấm.\nNhớ từng khoản.</string>
+    <string name="tiu_welcome_description">Lưu chi tiêu bằng hình ảnh, theo dõi ngân sách và hiểu thói quen của bạn theo cách nhẹ nhàng hơn.</string>
+    <string name="tiu_welcome_photo">ảnh</string>
+    <string name="tiu_welcome_amount">85K</string>
+    <string name="tiu_welcome_start">Bắt đầu với tiu</string>
+    <string name="tiu_welcome_login">Tôi đã có tài khoản</string>
+</resources>

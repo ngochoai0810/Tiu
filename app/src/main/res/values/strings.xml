@@ -76,4 +76,11 @@
     <string name="placeholder_stats_body">Biểu đồ theo danh mục sẽ có ở Tuần 4.</string>
     <string name="placeholder_camera_title">Chụp khoản chi</string>
     <string name="placeholder_camera_body">Chụp ảnh và OCR hóa đơn sẽ có ở Tuần 3–5 (phần của Hoài).</string>
+
+    <string name="forgot_eyebrow">ĐẶT LẠI MẬT KHẨU</string>
+    <string name="forgot_title">Quên mật khẩu?</string>
+    <string name="forgot_subtitle">Nhập email đã đăng ký để nhận liên kết đặt lại mật khẩu của bạn.</string>
+    <string name="action_send_link">Gửi liên kết</string>
+    <string name="forgot_success_msg">✓ Email đã được gửi! Vui lòng kiểm tra hộp thư đến (và mục spam) để hoàn tất việc đặt lại mật khẩu.</string>
+    <string name="action_back_to_login">Quay lại Đăng nhập</string>
 </resources>

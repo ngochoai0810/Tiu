@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tiu_paper"
+    android:fillViewport="true">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center"
+        android:orientation="vertical"
+        android:padding="24dp">
+
+        <LinearLayout
+            style="@style/Widget.Tiu.Card"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:orientation="vertical"
+            android:padding="32dp">
+
+            <ImageView
+                android:layout_width="88dp"
+                android:layout_height="70dp"
+                android:layout_marginBottom="24dp"
+                android:importantForAccessibility="no"
+                android:scaleType="fitStart"
+                android:src="@drawable/tiu_welcome_logo" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="TIU FINANCE"
+                android:textAppearance="@style/TextAppearance.Tiu.Eyebrow" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:gravity="center"
+                android:text="Bắt đầu với Tiu"
+                android:textAppearance="@style/TextAppearance.Tiu.H1" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="12dp"
+                android:layout_marginBottom="32dp"
+                android:gravity="center"
+                android:text="Quản lý chi tiêu, lập ngân sách và theo dõi tài chính cá nhân một cách đơn giản, trực quan và thú vị."
+                android:textAppearance="@style/TextAppearance.Tiu.Body"
+                android:textColor="@color/tiu_text_secondary" />
+
+            <TextView
+                android:id="@+id/btnGetStarted"
+                style="@style/Widget.Tiu.Button"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Bắt đầu ngay" />
+
+            <TextView
+                android:id="@+id/btnLoginDirect"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:padding="8dp"
+                android:text="Đã có tài khoản? Đăng nhập"
+                android:textColor="@color/tiu_ink"
+                android:textStyle="bold" />
+
+        </LinearLayout>
+    </LinearLayout>
+</ScrollView>

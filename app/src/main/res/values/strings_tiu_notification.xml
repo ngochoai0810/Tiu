@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="tiu_notification_step">BƯỚC 2 / 2 · THÔNG BÁO</string>
+    <string name="tiu_notification_title">Để tiu nhắc bạn\nđúng lúc</string>
+    <string name="tiu_notification_description">Chỉ những gì quan trọng, có thể tắt bất cứ lúc nào trong Hồ sơ.</string>
+    <string name="tiu_notification_time">tiu · 21:00</string>
+    <string name="tiu_notification_time_format">tiu · %1$02d:%2$02d</string>
+    <string name="tiu_notification_sample">Hôm nay bạn chưa chụp khoản nào. Ghi lại một tấm nhé!</string>
+    <string name="tiu_notification_preview">Xem trước thông báo</string>
+    <string name="tiu_notification_change_time">Đổi giờ nhắc</string>
+    <string name="tiu_notification_alert">Cảnh báo khi sắp vượt ngân sách</string>
+    <string name="tiu_notification_weekly">Tổng kết chi tiêu mỗi tuần</string>
+    <string name="tiu_notification_friends">Lời mời từ bạn bè</string>
+    <string name="tiu_notification_enable">Bật thông báo</string>
+    <string name="tiu_notification_skip">Để sau</string>
+</resources>
