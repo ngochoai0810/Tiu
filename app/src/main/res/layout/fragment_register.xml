@@ -8,7 +8,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
+        android:gravity="center"
         android:orientation="vertical"
         android:padding="24dp">
 
@@ -16,20 +16,48 @@
             style="@style/Widget.Tiu.Card"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:orientation="vertical">
+            android:orientation="vertical"
+            android:padding="24dp">
+
+            <TextView
+                android:layout_width="64dp"
+                android:layout_height="64dp"
+                android:layout_marginBottom="24dp"
+                android:background="@drawable/bg_doodle_circle"
+                android:gravity="center"
+                android:text="t"
+                android:textColor="@color/tiu_ink"
+                android:textSize="28sp"
+                android:textStyle="bold" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/register_eyebrow"
+                android:text="TẠO TÀI KHOẢN"
                 android:textAppearance="@style/TextAppearance.Tiu.Eyebrow" />
 
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="16dp"
-                android:text="@string/register_title"
+                android:layout_marginTop="8dp"
+                android:text="Bắt đầu nhật ký mới"
                 android:textAppearance="@style/TextAppearance.Tiu.H2" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="24dp"
+                android:text="Dữ liệu của bạn được lưu riêng tư và đồng bộ an toàn."
+                android:textAppearance="@style/TextAppearance.Tiu.BodySmall"
+                android:textColor="@color/tiu_text_secondary" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="6dp"
+                android:text="Họ và tên"
+                android:textAppearance="@style/TextAppearance.Tiu.Label" />
 
             <EditText
                 android:id="@+id/inputName"
@@ -37,35 +65,51 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="name"
-                android:hint="@string/hint_name"
+                android:hint="An Nguyễn"
                 android:inputType="textPersonName|textCapWords" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="Email"
+                android:textAppearance="@style/TextAppearance.Tiu.Label" />
 
             <EditText
                 android:id="@+id/inputEmail"
                 style="@style/Widget.Tiu.Input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:autofillHints="emailAddress"
-                android:hint="@string/hint_email"
+                android:hint="ban@email.com"
                 android:inputType="textEmailAddress" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="Mật khẩu"
+                android:textAppearance="@style/TextAppearance.Tiu.Label" />
 
             <EditText
                 android:id="@+id/inputPassword"
                 style="@style/Widget.Tiu.Input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
                 android:autofillHints="newPassword"
-                android:hint="@string/hint_password"
+                android:hint="Tối thiểu 8 ký tự"
                 android:inputType="textPassword" />
 
+            <!-- Hidden field to keep code working -->
             <EditText
                 android:id="@+id/inputConfirm"
                 style="@style/Widget.Tiu.Input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="12dp"
+                android:visibility="gone"
                 android:autofillHints="newPassword"
                 android:hint="@string/hint_password_confirm"
                 android:inputType="textPassword" />
@@ -84,8 +128,8 @@
                 style="@style/Widget.Tiu.Button"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="18dp"
-                android:text="@string/action_register" />
+                android:layout_marginTop="24dp"
+                android:text="Đăng ký" />
 
             <ProgressBar
                 android:id="@+id/progress"
@@ -95,17 +139,17 @@
                 android:layout_marginTop="12dp"
                 android:indeterminateTint="@color/tiu_orange"
                 android:visibility="gone" />
-        </LinearLayout>
 
-        <TextView
-            android:id="@+id/linkLogin"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="20dp"
-            android:padding="8dp"
-            android:text="@string/to_login"
-            android:textColor="@color/tiu_orange"
-            android:textStyle="bold" />
+            <TextView
+                android:id="@+id/linkLogin"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
+                android:layout_marginTop="20dp"
+                android:padding="8dp"
+                android:text="Đã có tài khoản? Đăng nhập"
+                android:textColor="@color/tiu_ink"
+                android:textStyle="bold" />
+        </LinearLayout>
     </LinearLayout>
 </ScrollView>

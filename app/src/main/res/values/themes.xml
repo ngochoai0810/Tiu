@@ -76,7 +76,7 @@
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">16dp</item>
         <item name="android:paddingTop">12dp</item>
-        <item name="android:paddingBottom">15dp</item>
+        <item name="android:paddingBottom">14dp</item>
         <item name="android:textSize">14sp</item>
         <item name="android:textColor">@color/tiu_ink</item>
         <item name="android:textColorHint">@color/tiu_text_secondary</item>
@@ -85,10 +85,10 @@
 
     <style name="Widget.Tiu.Button" parent="">
         <item name="android:background">@drawable/bg_doodle_button</item>
-        <item name="android:minHeight">56dp</item>
+        <item name="android:minHeight">54dp</item>
         <item name="android:gravity">center</item>
-        <item name="android:paddingBottom">4dp</item>
-        <item name="android:textSize">14sp</item>
+        <item name="android:paddingBottom">3dp</item>
+        <item name="android:textSize">15sp</item>
         <item name="android:textStyle">bold</item>
         <item name="android:textColor">@color/white</item>
         <item name="android:clickable">true</item>
@@ -112,7 +112,7 @@
         <item name="android:paddingStart">16dp</item>
         <item name="android:paddingEnd">18dp</item>
         <item name="android:paddingTop">14dp</item>
-        <item name="android:paddingBottom">18dp</item>
+        <item name="android:paddingBottom">16dp</item>
     </style>
 
     <style name="Widget.Tiu.CircleButton" parent="">

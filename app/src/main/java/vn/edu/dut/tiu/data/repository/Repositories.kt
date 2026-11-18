@@ -18,6 +18,7 @@ interface AuthRepository {
     val currentEmail: String?
     suspend fun signIn(email: String, password: String)
     suspend fun register(displayName: String, email: String, password: String)
+    suspend fun sendPasswordReset(email: String)
     suspend fun currentProfile(): UserProfile?
     fun signOut()
 }
@@ -34,6 +35,7 @@ interface CategoryRepository {
 interface TransactionRepository {
     /** Giao dịch trong một tháng, mới nhất trước, cập nhật realtime. */
     fun observeMonth(month: YearMonth): Flow<List<Transaction>>
+    fun observeRange(startMillis: Long, endMillis: Long): Flow<List<Transaction>>
     suspend fun get(id: String): Transaction?
     suspend fun add(transaction: Transaction): String
     suspend fun update(transaction: Transaction)

@@ -2,6 +2,8 @@ package vn.edu.dut.tiu.ui.transaction
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.storage.FirebaseStorage
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -11,6 +13,18 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
+import android.graphics.Bitmap
+import android.net.Uri
+import kotlinx.coroutines.suspendCancellableCoroutine
+import kotlin.coroutines.resume
+import kotlin.coroutines.resumeWithException
+import android.graphics.BitmapFactory
+import android.util.Base64
+import java.io.ByteArrayOutputStream
+import com.google.mlkit.vision.common.InputImage
+import com.google.mlkit.vision.text.TextRecognition
+import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import vn.edu.dut.tiu.data.model.Category
 import vn.edu.dut.tiu.data.model.Transaction
 import vn.edu.dut.tiu.data.model.TransactionType
@@ -39,6 +53,10 @@ class TransactionEditorViewModel(
         val dateMillis: Long = 0L,
         /** Giao dịch gốc khi sửa – Fragment dùng để điền sẵn số tiền / ghi chú. */
         val original: Transaction? = null,
+        val imageUri: String? = null,
+        val isOcrMode: Boolean = false,
+        val ocrAmount: String? = null,
+        val isUploadingImage: Boolean = false,
         val errors: Map<TransactionValidator.Field, String> = emptyMap(),
         val isSaving: Boolean = false,
     )
@@ -114,6 +132,14 @@ class TransactionEditorViewModel(
         refreshCategories()
     }
 
+    fun setImage(uri: String?, isOcrMode: Boolean = false) {
+        _state.update { it.copy(imageUri = uri, isOcrMode = isOcrMode) }
+    }
+    
+    fun setOcrAmount(amountText: String) {
+        _state.update { it.copy(ocrAmount = amountText) }
+    }
+
     fun setDate(millis: Long) {
         _state.update { it.copy(dateMillis = millis, errors = it.errors - TransactionValidator.Field.DATE) }
     }
@@ -127,29 +153,144 @@ class TransactionEditorViewModel(
         if (!result.isValid) return
 
         val category = s.selectedCategory!!
-        val tx = Transaction(
-            id = transactionId.orEmpty(),
-            type = s.type,
-            amount = result.amount!!,
-            categoryId = category.id,
-            categoryName = category.name,
-            note = cleanNote,
-            date = s.dateMillis,
-            imageUrl = s.original?.imageUrl,
-            recurringId = s.original?.recurringId,
-            createdAt = s.original?.createdAt ?: 0L,
-        )
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true) }
+            
+            var uploadedImageUrl = s.original?.imageUrl
+            
+            // Xử lý upload ảnh nếu có URI nội bộ (content:// hoặc file://)
+            if (s.imageUri != null && !s.imageUri.startsWith("http")) {
+                _state.update { it.copy(isUploadingImage = true) }
+                try {
+                    uploadedImageUrl = uploadImageToStorage(s.imageUri)
+                } catch (e: Exception) {
+                    _events.send(Event.Error("Lỗi tải ảnh lên: ${e.toUserMessage()}"))
+                    _state.update { it.copy(isSaving = false, isUploadingImage = false) }
+                    return@launch
+                }
+            } else if (s.imageUri == null) {
+                // Người dùng đã xóa ảnh
+                uploadedImageUrl = null
+            }
+
+            val tx = Transaction(
+                id = transactionId.orEmpty(),
+                type = s.type,
+                amount = result.amount!!,
+                categoryId = category.id,
+                categoryName = category.name,
+                note = cleanNote,
+                date = s.dateMillis,
+                imageUrl = uploadedImageUrl,
+                recurringId = s.original?.recurringId,
+                createdAt = s.original?.createdAt ?: 0L,
+            )
+
             try {
                 if (transactionId == null) transactionRepo.add(tx) else transactionRepo.update(tx)
                 _events.send(Event.Saved)
             } catch (e: Exception) {
                 _events.send(Event.Error(e.toUserMessage()))
             } finally {
-                _state.update { it.copy(isSaving = false) }
+                _state.update { it.copy(isSaving = false, isUploadingImage = false) }
             }
         }
+    }
+
+    private suspend fun uploadImageToStorage(uriString: String): String {
+        return suspendCancellableCoroutine { cont ->
+            try {
+                val uri = Uri.parse(uriString)
+                val context = vn.edu.dut.tiu.TiuApp.instance // Cần có context để đọc file
+                
+                // Mở luồng đọc file ảnh
+                val inputStream = context.contentResolver.openInputStream(uri)
+                val originalBitmap = BitmapFactory.decodeStream(inputStream)
+                inputStream?.close()
+
+                if (originalBitmap == null) {
+                    cont.resumeWithException(Exception("Không thể đọc file ảnh"))
+                    return@suspendCancellableCoroutine
+                }
+
+                // Nén ảnh lại (tối đa chiều dài/rộng là 800px)
+                val maxWidth = 800f
+                val maxHeight = 800f
+                val scale = minOf(maxWidth / originalBitmap.width, maxHeight / originalBitmap.height)
+                
+                val scaledBitmap = if (scale < 1) {
+                    Bitmap.createScaledBitmap(
+                        originalBitmap, 
+                        (originalBitmap.width * scale).toInt(), 
+                        (originalBitmap.height * scale).toInt(), 
+                        true
+                    )
+                } else originalBitmap
+
+                // Chuyển sang chuỗi Base64 (JPEG, chất lượng 70%)
+                val outputStream = ByteArrayOutputStream()
+                scaledBitmap.compress(Bitmap.CompressFormat.JPEG, 70, outputStream)
+                val byteArray = outputStream.toByteArray()
+                val base64String = Base64.encodeToString(byteArray, Base64.NO_WRAP)
+                
+                // Giải phóng bộ nhớ
+                if (scaledBitmap != originalBitmap) {
+                    scaledBitmap.recycle()
+                }
+                originalBitmap.recycle()
+
+                // Trả về chuỗi prefix Base64 chuẩn để có thể nhúng trực tiếp vào ImageView qua Glide
+                val dataUri = "data:image/jpeg;base64,$base64String"
+                cont.resume(dataUri)
+                
+            } catch (e: Exception) {
+                e.printStackTrace()
+                cont.resumeWithException(e)
+            }
+        }
+    }
+
+    fun performOcr(context: android.content.Context, uriString: String) {
+        if (!_state.value.isOcrMode) return
+        
+        viewModelScope.launch {
+            try {
+                val uri = Uri.parse(uriString)
+                val image = InputImage.fromFilePath(context, uri)
+                val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
+                
+                recognizer.process(image)
+                    .addOnSuccessListener { visionText ->
+                        val result = extractAmountFromText(visionText.text)
+                        if (result != null) {
+                            setOcrAmount(result)
+                        }
+                    }
+                    .addOnFailureListener { e ->
+                        // Lỗi nhận diện
+                        e.printStackTrace()
+                    }
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
+    }
+    
+    private fun extractAmountFromText(text: String): String? {
+        // Tìm các cụm số có dạng "120.000", "150,000", "50000"
+        val regex = Regex("""\b\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\b""")
+        val matches = regex.findAll(text).map { it.value }.toList()
+        
+        if (matches.isEmpty()) return null
+        
+        // Chọn số lớn nhất hợp lý (loại trừ các số quá nhỏ như ngày tháng)
+        val validAmounts = matches.mapNotNull { 
+            val clean = it.replace(".", "").replace(",", "")
+            clean.toLongOrNull()
+        }.filter { it > 1000 } // Giả sử hoá đơn thường > 1000đ
+        
+        val maxAmount = validAmounts.maxOrNull() ?: return null
+        return maxAmount.toString()
     }
 
     fun delete() {

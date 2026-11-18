@@ -37,6 +37,14 @@ data class HomeUiState(
     val income: Long = 0L,
     val expense: Long = 0L,
     val items: List<HomeItem> = emptyList(),
+    // Data for Calendar UI
+    val daysInMonth: List<LocalDate> = emptyList(),
+    val expenseByDate: Map<LocalDate, Long> = emptyMap(),
+    val photoByDate: Map<LocalDate, String> = emptyMap(),
+    val maxExpenseDate: LocalDate? = null,
+    val maxExpenseAmount: Long = 0L,
+    val averageExpensePerDay: Long = 0L,
+    // end Data for Calendar UI
     val loading: Boolean = true,
     val error: String? = null,
 ) {
@@ -82,14 +90,43 @@ class HomeViewModel(
         }
     }
 
-    private fun buildState(m: YearMonth, txs: List<Transaction>, cats: List<Category>) = HomeUiState(
-        monthLabel = DateUtils.monthLabel(m),
-        canGoNext = m < YearMonth.from(today()),
-        income = BudgetCalculator.totalIncome(txs),
-        expense = BudgetCalculator.totalExpense(txs),
-        items = groupByDay(txs, cats.associate { it.id to it.icon }, today()),
-        loading = false,
-    )
+    private fun buildState(m: YearMonth, txs: List<Transaction>, cats: List<Category>): HomeUiState {
+        val expenseTransactions = txs.filter { it.type == TransactionType.EXPENSE }
+        val expenseByDate = expenseTransactions.groupBy { DateUtils.toLocalDate(it.date) }
+            .mapValues { (_, list) -> list.sumOf { it.amount } }
+        val maxEntry = expenseByDate.maxByOrNull { it.value }
+
+        val photoByDate = txs.filter { !it.imageUrl.isNullOrBlank() }
+            .sortedByDescending { it.date }
+            .groupBy { DateUtils.toLocalDate(it.date) }
+            .mapValues { (_, list) -> list.first().imageUrl!! }
+
+        val daysInMonth = mutableListOf<LocalDate>()
+        for (i in 1..m.lengthOfMonth()) {
+            daysInMonth.add(m.atDay(i))
+        }
+
+        val totalExpense = BudgetCalculator.totalExpense(txs)
+        val passedDays = if (m.isBefore(YearMonth.from(today()))) m.lengthOfMonth() 
+            else if (m == YearMonth.from(today())) today().dayOfMonth 
+            else 0
+        val avg = if (passedDays > 0) totalExpense / passedDays else 0L
+
+        return HomeUiState(
+            monthLabel = DateUtils.monthLabel(m),
+            canGoNext = m < YearMonth.from(today()),
+            income = BudgetCalculator.totalIncome(txs),
+            expense = totalExpense,
+            items = groupByDay(txs, cats.associate { it.id to it.icon }, today()),
+            daysInMonth = daysInMonth,
+            expenseByDate = expenseByDate,
+            photoByDate = photoByDate,
+            maxExpenseDate = maxEntry?.key,
+            maxExpenseAmount = maxEntry?.value ?: 0L,
+            averageExpensePerDay = avg,
+            loading = false,
+        )
+    }
 
     companion object {
         /** Nhóm giao dịch theo ngày (mới nhất trước), mỗi nhóm có tiêu đề + tổng thu-chi của ngày. */

@@ -1,170 +1,333 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/tiu_paper"
-    android:orientation="vertical">
+    android:background="@color/tiu_paper">
 
     <include
         android:id="@+id/topBar"
-        layout="@layout/layout_top_bar" />
+        layout="@layout/layout_top_bar"
+        app:layout_constraintTop_toTopOf="parent" />
 
     <TextView
+        android:id="@+id/tvEyebrow"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="24dp"
-        android:layout_marginTop="8dp"
-        android:text="@string/home_eyebrow"
-        android:textAppearance="@style/TextAppearance.Tiu.Eyebrow" />
+        android:layout_marginTop="16dp"
+        android:text="LỊCH CHI TIÊU"
+        android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar" />
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <TextView
+        android:id="@+id/tvTitle"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:paddingHorizontal="16dp">
+        android:layout_marginStart="24dp"
+        android:text="Tháng 6"
+        android:textAppearance="@style/TextAppearance.Tiu.Display"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvEyebrow" />
 
-        <ImageView
-            android:id="@+id/btnPrevMonth"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Tháng trước"
-            android:padding="8dp"
-            android:src="@drawable/ic_chevron_left"
-            app:tint="@color/tiu_ink"
-            xmlns:app="http://schemas.android.com/apk/res-auto" />
+    <ImageView
+        android:id="@+id/btnSearchHome"
+        style="@style/Widget.Tiu.CircleButton"
+        android:layout_width="48dp"
+        android:layout_height="48dp"
+        android:layout_marginEnd="20dp"
+        android:contentDescription="Tìm kiếm"
+        android:src="@drawable/ic_search"
+        app:layout_constraintBottom_toBottomOf="@id/tvSubtitle"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="@id/tvTitle" />
+
+    <TextView
+        android:id="@+id/tvSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="4dp"
+        android:text="12 khoản chi · 1.284.000₫"
+        android:textAppearance="@style/TextAppearance.Tiu.BodySmall"
+        android:textColor="@color/tiu_text_secondary"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvTitle" />
+
+    <View
+        android:layout_width="48dp"
+        android:layout_height="3dp"
+        android:layout_marginStart="24dp"
+        android:layout_marginTop="8dp"
+        android:background="@color/tiu_orange"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle" />
+
+    <!-- Toggle container -->
+    <LinearLayout
+        android:id="@+id/toggleContainer"
+        android:layout_width="match_parent"
+        android:layout_height="56dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="24dp"
+        android:background="@drawable/bg_doodle_input"
+        android:orientation="horizontal"
+        android:padding="4dp"
+        app:layout_constraintTop_toBottomOf="@id/tvSubtitle">
 
         <TextView
-            android:id="@+id/textMonth"
+            android:id="@+id/btnTabCalendar"
             android:layout_width="0dp"
-            android:layout_height="wrap_content"
+            android:layout_height="match_parent"
             android:layout_weight="1"
+            android:background="@drawable/bg_toggle_selected"
             android:gravity="center"
-            android:textAppearance="@style/TextAppearance.Tiu.H1"
-            tools:text="Tháng 6, 2025" />
+            android:text="Lịch chi tiêu"
+            android:textAppearance="@style/TextAppearance.Tiu.Label" />
 
-        <ImageView
-            android:id="@+id/btnNextMonth"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:background="?attr/selectableItemBackgroundBorderless"
-            android:contentDescription="Tháng sau"
-            android:padding="8dp"
-            android:src="@drawable/ic_chevron_right"
-            app:tint="@color/tiu_ink"
-            xmlns:app="http://schemas.android.com/apk/res-auto" />
+        <TextView
+            android:id="@+id/btnTabPhoto"
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:background="@null"
+            android:gravity="center"
+            android:text="Nhật ký ảnh"
+            android:textAppearance="@style/TextAppearance.Tiu.Label"
+            android:textColor="@color/tiu_text_secondary" />
     </LinearLayout>
 
-    <!-- Thẻ tổng kết tháng -->
-    <LinearLayout
-        style="@style/Widget.Tiu.Card"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="12dp"
-        android:background="@drawable/bg_doodle_card_orange"
-        android:orientation="horizontal">
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_expense"
-                android:textAppearance="@style/TextAppearance.Tiu.Caption"
-                android:textColor="@color/tiu_ink" />
-
-            <TextView
-                android:id="@+id/textExpense"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Tiu.Label"
-                android:textSize="15sp"
-                tools:text="1.284.000 ₫" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_income"
-                android:textAppearance="@style/TextAppearance.Tiu.Caption"
-                android:textColor="@color/tiu_ink" />
-
-            <TextView
-                android:id="@+id/textIncome"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Tiu.Label"
-                android:textSize="15sp"
-                tools:text="3.000.000 ₫" />
-        </LinearLayout>
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="@string/label_balance"
-                android:textAppearance="@style/TextAppearance.Tiu.Caption"
-                android:textColor="@color/tiu_ink" />
-
-            <TextView
-                android:id="@+id/textBalance"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:textAppearance="@style/TextAppearance.Tiu.Label"
-                android:textSize="15sp"
-                tools:text="1.716.000 ₫" />
-        </LinearLayout>
-    </LinearLayout>
-
-    <FrameLayout
+    <ScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_marginTop="8dp"
-        android:layout_weight="1">
+        android:layout_marginTop="16dp"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/toggleContainer">
 
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/recycler"
+        <LinearLayout
+            style="@style/Widget.Tiu.Card"
             android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:clipToPadding="false"
-            android:paddingHorizontal="20dp"
-            android:paddingBottom="16dp" />
-
-        <TextView
-            android:id="@+id/textEmpty"
-            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:gravity="center"
-            android:padding="24dp"
-            android:text="@string/home_empty"
-            android:textAppearance="@style/TextAppearance.Tiu.Body"
-            android:textColor="@color/tiu_text_secondary"
-            android:visibility="gone" />
+            android:layout_marginHorizontal="20dp"
+            android:layout_marginBottom="16dp"
+            android:orientation="vertical"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="12dp"
+            android:paddingBottom="12dp">
 
-        <ProgressBar
-            android:id="@+id/progress"
-            android:layout_width="32dp"
-            android:layout_height="32dp"
-            android:layout_gravity="center"
-            android:indeterminateTint="@color/tiu_orange" />
-    </FrameLayout>
-</LinearLayout>
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <ImageView
+                    android:id="@+id/btnPrevMonth"
+                    style="@style/Widget.Tiu.CircleButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_chevron_left" />
+
+                <TextView
+                    android:id="@+id/textMonth"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Tháng 6, 2025"
+                    android:textAppearance="@style/TextAppearance.Tiu.H3" />
+
+                <ImageView
+                    android:id="@+id/btnNextMonth"
+                    style="@style/Widget.Tiu.CircleButton"
+                    android:layout_width="40dp"
+                    android:layout_height="40dp"
+                    android:padding="8dp"
+                    android:src="@drawable/ic_chevron_right" />
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="T2"
+                    android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                    android:textColor="@color/tiu_ink" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="T3"
+                    android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                    android:textColor="@color/tiu_ink" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="T4"
+                    android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                    android:textColor="@color/tiu_ink" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="T5"
+                    android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                    android:textColor="@color/tiu_ink" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="T6"
+                    android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                    android:textColor="@color/tiu_ink" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="T7"
+                    android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                    android:textColor="@color/tiu_ink" />
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="CN"
+                    android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                    android:textColor="@color/tiu_ink" />
+            </LinearLayout>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/recyclerCalendar"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:nestedScrollingEnabled="false"
+                app:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
+                app:spanCount="7"
+                tools:itemCount="35"
+                tools:listitem="@layout/item_day_calendar" />
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="end"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:text="Ít"
+                    android:textAppearance="@style/TextAppearance.Tiu.Caption" />
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="@drawable/bg_doodle_input" />
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="#FFD8B5" />
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="#FFAD66" />
+
+                <View
+                    android:layout_width="12dp"
+                    android:layout_height="12dp"
+                    android:layout_marginEnd="4dp"
+                    android:background="#E85D45" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Nhiều"
+                    android:textAppearance="@style/TextAppearance.Tiu.Caption" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="12dp"
+                android:background="@drawable/bg_dashed"
+                android:layerType="software" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Chi nhiều nhất"
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption" />
+
+                    <TextView
+                        android:id="@+id/tvMaxExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="21/6 · 420.000₫"
+                        android:textAppearance="@style/TextAppearance.Tiu.Label" />
+                </LinearLayout>
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Trung bình/ngày"
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption" />
+
+                    <TextView
+                        android:id="@+id/tvAvgExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="42.800₫"
+                        android:textAppearance="@style/TextAppearance.Tiu.Label" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

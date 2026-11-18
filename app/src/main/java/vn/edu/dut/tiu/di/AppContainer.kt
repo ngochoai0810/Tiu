@@ -8,7 +8,9 @@ import vn.edu.dut.tiu.data.repository.CategoryRepository
 import vn.edu.dut.tiu.data.repository.FirebaseAuthRepository
 import vn.edu.dut.tiu.data.repository.FirestoreBudgetRepository
 import vn.edu.dut.tiu.data.repository.FirestoreCategoryRepository
+import vn.edu.dut.tiu.data.repository.FirestoreNotificationRepository
 import vn.edu.dut.tiu.data.repository.FirestoreTransactionRepository
+import vn.edu.dut.tiu.data.repository.NotificationRepository
 import vn.edu.dut.tiu.data.repository.TransactionRepository
 
 /**
@@ -24,4 +26,5 @@ class AppContainer {
     val categoryRepository: CategoryRepository by lazy { FirestoreCategoryRepository(db, uidProvider) }
     val transactionRepository: TransactionRepository by lazy { FirestoreTransactionRepository(db, uidProvider) }
     val budgetRepository: BudgetRepository by lazy { FirestoreBudgetRepository(db, uidProvider) }
+    val notificationRepository: NotificationRepository by lazy { FirestoreNotificationRepository(db, uidProvider) }
 }

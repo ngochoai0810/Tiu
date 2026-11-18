@@ -1,13 +1,18 @@
 package vn.edu.dut.tiu.ui.transaction
 
+import android.graphics.Color
+import android.graphics.drawable.ColorDrawable
+import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.fragment.findNavController
+import com.bumptech.glide.Glide
 import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
@@ -55,10 +60,25 @@ class TransactionEditorFragment : Fragment(R.layout.fragment_transaction_editor)
             vm.save(b.inputAmount.text.toString(), b.inputNote.text.toString())
         }
         b.btnDelete.setOnClickListener { confirmDelete() }
+        b.btnRemoveImage.setOnClickListener { vm.setImage(null) }
+
+        // Nhận ảnh từ Bundle nếu được gọi từ Camera/Thư viện
+        arguments?.getString("imageUri")?.let { uriString ->
+            val isOcrMode = arguments?.getBoolean("isOcrMode", false) ?: false
+            vm.setImage(uriString, isOcrMode)
+            if (isOcrMode) {
+                vm.performOcr(requireContext(), uriString)
+            }
+        }
+        
+        b.btnSelectImage.setOnClickListener {
+            findNavController().navigate(R.id.cameraFragment)
+        }
 
         collectOnStarted(vm.state) { s ->
             b.textTitle.setText(if (s.isEditing) R.string.editor_edit_title else R.string.editor_add_title)
             if (!s.isEditing && s.type == TransactionType.INCOME) b.textTitle.text = "Thêm khoản thu"
+            b.btnSave.text = if (s.isEditing) "Lưu thay đổi" else "Lưu vào nhật ký"
             b.btnDelete.visibility = if (s.isEditing) View.VISIBLE else View.GONE
             renderTypeToggle(b.toggleExpense, b.toggleIncome, s.type)
             b.fieldCategory.text = s.selectedCategory?.let { "${it.icon} ${it.name}".trim() }
@@ -69,15 +89,37 @@ class TransactionEditorFragment : Fragment(R.layout.fragment_transaction_editor)
             b.errorDate.showError(s.errors[Field.DATE])
             b.errorNote.showError(s.errors[Field.NOTE])
 
-            b.btnSave.isEnabled = !s.isSaving
-            b.btnDelete.isEnabled = !s.isSaving
-            b.progress.visibility = if (s.isSaving) View.VISIBLE else View.GONE
+            b.btnSave.isEnabled = !s.isSaving && !s.isUploadingImage
+            b.btnDelete.isEnabled = !s.isSaving && !s.isUploadingImage
+            b.progress.visibility = if (s.isSaving || s.isUploadingImage) View.VISIBLE else View.GONE
+
+            if (s.imageUri != null) {
+                b.layoutImagePreview.visibility = View.VISIBLE
+                b.btnSelectImage.visibility = View.GONE
+                Glide.with(this).load(Uri.parse(s.imageUri)).into(b.imagePreview)
+            } else {
+                b.layoutImagePreview.visibility = View.GONE
+                b.btnSelectImage.visibility = View.VISIBLE
+            }
 
             val original = s.original
             if (original != null && !vm.prefillConsumed) {
                 vm.prefillConsumed = true
                 b.inputAmount.setText(MoneyFormat.group(original.amount))
                 b.inputNote.setText(original.note)
+                if (original.imageUrl != null && s.imageUri == null) {
+                    vm.setImage(original.imageUrl, false)
+                }
+            }
+            
+            // Nếu có kết quả OCR mới và inputAmount đang trống hoặc khớp logic
+            if (s.isOcrMode && s.ocrAmount != null && b.inputAmount.text.toString().isEmpty()) {
+                b.inputAmount.setText(MoneyFormat.group(s.ocrAmount.toLong()))
+                b.chipOcrAuto.visibility = View.VISIBLE
+                b.tooltipOcr.visibility = View.VISIBLE
+            } else {
+                b.chipOcrAuto.visibility = View.GONE
+                b.tooltipOcr.visibility = View.GONE
             }
         }
 
@@ -114,7 +156,6 @@ class TransactionEditorFragment : Fragment(R.layout.fragment_transaction_editor)
         val current = DateUtils.toLocalDate(vm.state.value.dateMillis)
         val picker = MaterialDatePicker.Builder.datePicker()
             .setTitleText(R.string.label_date)
-            // MaterialDatePicker làm việc với millis UTC 00:00
             .setSelection(current.atStartOfDay(ZoneOffset.UTC).toInstant().toEpochMilli())
             .setCalendarConstraints(
                 CalendarConstraints.Builder().setValidator(DateValidatorPointBackward.now()).build()
@@ -122,7 +163,6 @@ class TransactionEditorFragment : Fragment(R.layout.fragment_transaction_editor)
             .build()
         picker.addOnPositiveButtonClickListener { utcMillis ->
             val date = Instant.ofEpochMilli(utcMillis).atZone(ZoneOffset.UTC).toLocalDate()
-            // Giữ giờ hiện tại để thứ tự trong ngày hợp lý
             val millis = LocalDateTime.of(date, LocalTime.now(DateUtils.zone))
                 .atZone(DateUtils.zone).toInstant().toEpochMilli()
             vm.setDate(millis)
@@ -131,11 +171,23 @@ class TransactionEditorFragment : Fragment(R.layout.fragment_transaction_editor)
     }
 
     private fun confirmDelete() {
-        MaterialAlertDialogBuilder(requireContext())
-            .setTitle(R.string.delete_tx_title)
-            .setMessage("Thao tác này không thể hoàn tác.")
-            .setNegativeButton(R.string.action_cancel, null)
-            .setPositiveButton(R.string.action_confirm_delete) { _, _ -> vm.delete() }
-            .show()
+        val dialogView = layoutInflater.inflate(R.layout.dialog_delete_transaction, null)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setView(dialogView)
+            .setBackground(ColorDrawable(Color.TRANSPARENT))
+            .create()
+
+        val current = vm.state.value.original
+        if (current != null) {
+            val desc = "“${current.note.ifBlank { current.categoryName }}” · ${MoneyFormat.format(current.amount)} · ${DateUtils.shortDate(current.              date)}"
+            dialogView.findViewById<TextView>(R.id.dialogMessage).text = "$desc\nẢnh và ghi chú cũng sẽ bị xóa."
+        }
+
+        dialogView.findViewById<View>(R.id.btnCancel).setOnClickListener { dialog.dismiss() }
+        dialogView.findViewById<View>(R.id.btnConfirmDelete).setOnClickListener {
+            dialog.dismiss()
+            vm.delete()
+        }
+        dialog.show()
     }
 }

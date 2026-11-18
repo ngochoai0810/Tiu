@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "1040589118881",
+    "project_id": "tiu-app-d7871",
+    "storage_bucket": "tiu-app-d7871.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1040589118881:android:158eaed9152319f715bfe0",
+        "android_client_info": {
+          "package_name": "vn.edu.dut.tiu"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDSDEsGVOljrCqADNZYyCgOe3hmPsqgXQc"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

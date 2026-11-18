@@ -1,5 +1,6 @@
 package vn.edu.dut.tiu.ui
 
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNotNull
@@ -85,6 +86,8 @@ class TransactionEditorViewModelTest {
 }
 
 class HomeGroupingTest {
+    @get:Rule val mainRule = MainDispatcherRule()
+
     @Test fun groupsByDayNewestFirstWithNetTotal() {
         val today = LocalDate.of(2025, 6, 14)
         fun at(d: LocalDate, hour: Int) = DateUtils.startOfDay(d) + hour * 3_600_000L
@@ -102,6 +105,27 @@ class HomeGroupingTest {
         assertEquals("c", (items[1] as HomeItem.Row).transaction.id) // mới nhất trong ngày trước
         assertEquals("🍜", (items[2] as HomeItem.Row).icon)
         assertTrue((items[3] as HomeItem.Header).label.startsWith("Hôm qua"))
+    }
+
+    @OptIn(kotlinx.coroutines.ExperimentalCoroutinesApi::class)
+    @Test fun buildsPhotoByDateMap() = runTest {
+        val today = LocalDate.now(DateUtils.zone)
+        fun at(d: LocalDate, hour: Int) = DateUtils.startOfDay(d) + hour * 3_600_000L
+        val txs = listOf(
+            Transaction(id = "a", amount = 85_000, categoryId = "an_uong", date = at(today, 9), imageUrl = "https://example.com/a.jpg"),
+            Transaction(id = "b", amount = 30_000, categoryId = "an_uong", date = at(today.minusDays(1), 8), imageUrl = ""),
+        )
+        val repo = FakeTransactionRepository(txs)
+        val catRepo = FakeCategoryRepository(DefaultCategories.all)
+        val vm = HomeViewModel(repo, catRepo) { today }
+
+        backgroundScope.launch { vm.state.collect {} }
+        testScheduler.advanceUntilIdle()
+
+        val s = vm.state.value
+        assertEquals(1, s.photoByDate.size)
+        assertEquals("https://example.com/a.jpg", s.photoByDate[today])
+        assertNull(s.photoByDate[today.minusDays(1)])
     }
 }
 
