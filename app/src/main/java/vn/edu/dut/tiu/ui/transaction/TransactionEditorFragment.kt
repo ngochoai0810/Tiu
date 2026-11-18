@@ -5,9 +5,10 @@ import android.graphics.drawable.ColorDrawable
 import android.net.Uri
 import android.os.Bundle
 import android.view.View
+import android.view.LayoutInflater
+import android.view.ViewGroup
 import android.widget.TextView
 import android.widget.Toast
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
@@ -17,6 +18,9 @@ import com.google.android.material.datepicker.CalendarConstraints
 import com.google.android.material.datepicker.DateValidatorPointBackward
 import com.google.android.material.datepicker.MaterialDatePicker
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
+import com.google.android.material.bottomsheet.BottomSheetDialogFragment
+import com.google.android.material.bottomsheet.BottomSheetDialog
+import com.google.android.material.bottomsheet.BottomSheetBehavior
 import vn.edu.dut.tiu.R
 import vn.edu.dut.tiu.data.model.TransactionType
 import vn.edu.dut.tiu.databinding.FragmentTransactionEditorBinding
@@ -33,7 +37,26 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
 
-class TransactionEditorFragment : Fragment(R.layout.fragment_transaction_editor) {
+class TransactionEditorFragment : BottomSheetDialogFragment() {
+
+    override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
+        inflater.inflate(R.layout.fragment_transaction_editor, container, false)
+
+    override fun onStart() {
+        super.onStart()
+        val sheetDialog = dialog as? BottomSheetDialog ?: return
+        val sheet = sheetDialog.findViewById<View>(com.google.android.material.R.id.design_bottom_sheet) ?: return
+        val height = (resources.displayMetrics.heightPixels * 0.5f).toInt()
+        sheet.layoutParams = sheet.layoutParams.apply { this.height = height }
+        sheet.setBackgroundColor(Color.TRANSPARENT)
+        sheetDialog.behavior.apply {
+            peekHeight = height
+            maxHeight = height
+            isFitToContents = true
+            skipCollapsed = true
+            state = BottomSheetBehavior.STATE_EXPANDED
+        }
+    }
 
     private val vm: TransactionEditorViewModel by viewModels {
         viewModelFactory {
@@ -62,15 +85,18 @@ class TransactionEditorFragment : Fragment(R.layout.fragment_transaction_editor)
         b.btnDelete.setOnClickListener { confirmDelete() }
         b.btnRemoveImage.setOnClickListener { vm.setImage(null) }
 
-        // Nhận ảnh từ Bundle nếu được gọi từ Camera/Thư viện
-        arguments?.getString("imageUri")?.let { uriString ->
-            val isOcrMode = arguments?.getBoolean("isOcrMode", false) ?: false
-            vm.setImage(uriString, isOcrMode)
-            if (isOcrMode) {
-                vm.performOcr(requireContext(), uriString)
+        // Read the navigation image once, including after process recreation.
+        if (!vm.imageArgumentConsumed) {
+            vm.imageArgumentConsumed = true
+            arguments?.getString("imageUri")?.let { uriString ->
+                val isOcrMode = arguments?.getBoolean("isOcrMode", false) ?: false
+                vm.setImage(uriString, isOcrMode)
+                if (isOcrMode) {
+                    vm.performOcr(requireContext(), uriString)
+                }
             }
         }
-        
+
         b.btnSelectImage.setOnClickListener {
             findNavController().navigate(R.id.cameraFragment)
         }
@@ -112,14 +138,26 @@ class TransactionEditorFragment : Fragment(R.layout.fragment_transaction_editor)
                 }
             }
             
-            // Nếu có kết quả OCR mới và inputAmount đang trống hoặc khớp logic
-            if (s.isOcrMode && s.ocrAmount != null && b.inputAmount.text.toString().isEmpty()) {
-                b.inputAmount.setText(MoneyFormat.group(s.ocrAmount.toLong()))
-                b.chipOcrAuto.visibility = View.VISIBLE
-                b.tooltipOcr.visibility = View.VISIBLE
-            } else {
-                b.chipOcrAuto.visibility = View.GONE
-                b.tooltipOcr.visibility = View.GONE
+            val ocrAmount = s.ocrAmount?.toLongOrNull()
+            if (ocrAmount != null && !vm.ocrPrefillConsumed && b.inputAmount.text.isNullOrEmpty()) {
+                vm.consumeOcrPrefill()
+                b.inputAmount.setText(MoneyFormat.group(ocrAmount))
+            }
+            b.textEyebrow.visibility = if (s.isOcrMode) View.VISIBLE else View.GONE
+            b.textEyebrow.text = when {
+                s.isRecognizing -> "OCR · ĐANG NHẬN DIỆN"
+                s.ocrError != null -> "OCR · KHÔNG ĐỌC ĐƯỢC ẢNH"
+                ocrAmount != null -> "OCR · ĐÃ NHẬN DIỆN ${MoneyFormat.format(ocrAmount)}"
+                else -> "OCR · CHƯA TÌM THẤY SỐ TIỀN"
+            }
+            b.chipOcrAuto.visibility = if (s.isOcrMode && ocrAmount != null) View.VISIBLE else View.GONE
+            b.chipOcrAuto.text = "Đọc từ ảnh: ${ocrAmount?.let(MoneyFormat::format).orEmpty()}"
+            b.tooltipOcr.visibility = if (s.isOcrMode) View.VISIBLE else View.GONE
+            b.tooltipOcr.text = when {
+                s.isRecognizing -> "Đang đọc chữ trong ảnh hóa đơn…"
+                s.ocrError != null -> s.ocrError
+                ocrAmount != null -> "Kiểm tra lại số tiền ${MoneyFormat.format(ocrAmount)} trước khi lưu."
+                else -> "Chưa nhận diện được số tiền. Bạn có thể nhập thủ công."
             }
         }
 
@@ -145,7 +183,7 @@ class TransactionEditorFragment : Fragment(R.layout.fragment_transaction_editor)
             Toast.makeText(requireContext(), "Chưa có danh mục nào, hãy tạo trong Tài khoản > Quản lý danh mục", Toast.LENGTH_LONG).show()
             return
         }
-        val labels = categories.map { "${it.icon}  ${it.name}" }.toTypedArray()
+        val labels = categories.map { "${it.icon} ${it.name}".trim() }.toTypedArray()
         MaterialAlertDialogBuilder(requireContext())
             .setTitle(R.string.choose_category)
             .setItems(labels) { _, which -> vm.selectCategory(categories[which]) }

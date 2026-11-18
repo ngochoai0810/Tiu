@@ -6,7 +6,7 @@
     <color name="tiu_orange_pastel">#FFB780</color>   <!-- Tiu/Brand/Secondary – Cam pastel -->
     <color name="tiu_ink">#4A3427</color>             <!-- Tiu/Brand/Ink – Nâu nét doodle -->
     <color name="tiu_peach">#FBD9BC</color>           <!-- Tiu/Brand/Peach – Đào nhạt -->
-    <color name="tiu_icon_bg">#DF8038</color>         <!-- Tiu/Brand/Icon Background -->
+    <color name="tiu_icon_bg">#FCF5E6</color>         <!-- Tiu/Brand/Icon Background -->
     <!-- Nền & trung tính -->
     <color name="tiu_paper">#FFF7E8</color>           <!-- Tiu/Neutral/Background – Nền giấy -->
     <color name="tiu_card">#FFFDF7</color>            <!-- Tiu/Neutral/Surface – Card kem -->

@@ -31,7 +31,8 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
         val error = (if (name.isBlank()) "Nhập tên hiển thị" else null)
             ?: validateEmail(email)
             ?: validatePassword(password)
-            ?: (if (password != confirm) "Mật khẩu nhập lại không khớp" else null)
+            ?: (if (password.length > 8) "Mật khẩu tối đa 8 ký tự" else null)
+            ?: (if (confirm.isBlank()) "Vui lòng nhập lại mật khẩu" else if (password != confirm) "Mật khẩu nhập lại không khớp" else null)
         if (error != null) return _state.update { it.copy(error = error) }
         execute { repo.register(name.trim(), email.trim(), password) }
     }

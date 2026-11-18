@@ -1,274 +1,281 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.constraintlayout.widget.ConstraintLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/tiu_paper">
-
-    <include
-        android:id="@+id/topBar"
-        layout="@layout/layout_top_bar"
-        app:layout_constraintTop_toTopOf="parent" />
-
-    <!-- Khung ngắm Camera chính bo góc lớn kiểu Doodle -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/cameraBox"
+  <include
+      android:id="@+id/topBar" layout="@layout/layout_top_bar"
+      app:layout_constraintTop_toTopOf="parent" />
+  <!-- Khung ngắm Camera chính bo góc lớn kiểu Doodle -->
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/cameraBox"
+      android:layout_width="match_parent"
+      android:layout_height="0dp"
+      android:layout_marginHorizontal="20dp"
+      android:layout_marginTop="8dp"
+      android:layout_marginBottom="12dp"
+      android:background="@drawable/bg_camera_box"
+      android:clipChildren="true"
+      app:layout_constraintBottom_toTopOf="@id/bottomControls"
+      app:layout_constraintTop_toBottomOf="@id/topBar"
+      android:clipToOutline="true">
+    <androidx.camera.view.PreviewView
+        android:id="@+id/viewFinder"
         android:layout_width="match_parent"
-        android:layout_height="0dp"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="8dp"
-        android:layout_marginBottom="16dp"
-        android:background="@drawable/bg_camera_box"
-        android:clipChildren="true"
-        app:layout_constraintBottom_toTopOf="@id/bottomControls"
-        app:layout_constraintTop_toBottomOf="@id/topBar">
-
-        <androidx.camera.view.PreviewView
-            android:id="@+id/viewFinder"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-
-        <!-- Nút Flash -->
-        <ImageView
-            android:id="@+id/btnFlash"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_doodle_circle"
-            android:backgroundTint="#66000000"
-            android:padding="8dp"
-            android:src="@drawable/ic_flash"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            app:tint="@color/white" />
-
-        <!-- Toggle Chế độ [ OCR | Ảnh ] -->
-        <LinearLayout
-            android:id="@+id/toggleMode"
-            android:layout_width="wrap_content"
-            android:layout_height="38dp"
-            android:layout_marginTop="16dp"
-            android:background="@drawable/bg_bottom_nav"
-            android:backgroundTint="#80000000"
-            android:gravity="center_vertical"
-            android:orientation="horizontal"
-            android:padding="3dp"
-            app:layout_constraintEnd_toStartOf="@id/btnZoom"
-            app:layout_constraintStart_toEndOf="@id/btnFlash"
-            app:layout_constraintTop_toTopOf="parent">
-
-            <TextView
-                android:id="@+id/tabOcr"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:background="@drawable/bg_toggle_selected"
-                android:gravity="center"
-                android:paddingHorizontal="14dp"
-                android:text="📷 OCR"
-                android:textAppearance="@style/TextAppearance.Tiu.Label"
-                android:textColor="@color/tiu_ink"
-                android:textSize="12sp" />
-
-            <TextView
-                android:id="@+id/tabPhoto"
-                android:layout_width="wrap_content"
-                android:layout_height="match_parent"
-                android:gravity="center"
-                android:paddingHorizontal="14dp"
-                android:text="🖼️ Ảnh"
-                android:textAppearance="@style/TextAppearance.Tiu.Label"
-                android:textColor="@color/white"
-                android:textSize="12sp" />
-        </LinearLayout>
-
-        <!-- Nút Zoom 1x -->
-        <TextView
-            android:id="@+id/btnZoom"
-            android:layout_width="40dp"
-            android:layout_height="40dp"
-            android:layout_marginTop="16dp"
-            android:layout_marginEnd="16dp"
-            android:background="@drawable/bg_doodle_circle"
-            android:backgroundTint="#66000000"
-            android:gravity="center"
-            android:text="1×"
-            android:textColor="@color/white"
-            android:textSize="13sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Khung quét nét đứt lấy nét hóa đơn -->
-        <View
-            android:id="@+id/viewReceiptFrame"
-            android:layout_width="0dp"
-            android:layout_height="0dp"
-            android:layout_marginHorizontal="28dp"
-            android:layout_marginTop="60dp"
-            android:layout_marginBottom="70dp"
-            android:background="@drawable/bg_dashed"
-            android:backgroundTint="#1AFFFFFF"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Nhãn "Đang quét hóa đơn..." -->
-        <TextView
-            android:id="@+id/badgeScanning"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="16dp"
-            android:background="@drawable/bg_doodle_input"
-            android:paddingHorizontal="14dp"
-            android:paddingVertical="5dp"
-            android:text="✨ Đang quét hóa đơn..."
-            android:textAppearance="@style/TextAppearance.Tiu.Caption"
-            android:textColor="@color/tiu_orange"
-            android:textStyle="bold"
-            app:layout_constraintBottom_toTopOf="@id/tvInstructionTitle"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <!-- Dòng hướng dẫn -->
-        <TextView
-            android:id="@+id/tvInstructionSubtitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginBottom="4dp"
-            android:text="Chạm để lấy nét"
-            android:textAppearance="@style/TextAppearance.Tiu.Caption"
-            android:textColor="#CCFFFFFF"
-            app:layout_constraintBottom_toTopOf="@id/tvInstructionTitle"
-            app:layout_constraintStart_toStartOf="parent" />
-
-        <TextView
-            android:id="@+id/tvInstructionTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="20dp"
-            android:layout_marginBottom="18dp"
-            android:text="Chụp món đồ hoặc hóa đơn"
-            android:textAppearance="@style/TextAppearance.Tiu.Label"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Cụm điều khiển chụp bên dưới Camera -->
-    <androidx.constraintlayout.widget.ConstraintLayout
-        android:id="@+id/bottomControls"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="80dp"
-        android:paddingHorizontal="32dp"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <!-- Nút Thư viện ảnh -->
-        <ImageView
-            android:id="@+id/btnGallery"
-            style="@style/Widget.Tiu.CircleButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:contentDescription="Thư viện ảnh"
-            android:src="@drawable/ic_grid"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Nút Chụp tròn Shutter lớn -->
-        <View
-            android:id="@+id/btnShutter"
-            android:layout_width="72dp"
-            android:layout_height="72dp"
-            android:background="@drawable/bg_shutter"
-            android:clickable="true"
-            android:focusable="true"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <!-- Nút Đảo camera -->
-        <ImageView
-            android:id="@+id/btnFlipCamera"
-            style="@style/Widget.Tiu.CircleButton"
-            android:layout_width="48dp"
-            android:layout_height="48dp"
-            android:contentDescription="Lật camera"
-            android:src="@drawable/ic_flip_camera"
-            app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-
-    <!-- Floating Toast "Đã lưu 85.000₫" dạng Doodle nổi (Main đã lưu.png) -->
+        android:layout_height="match_parent"
+        app:implementationMode="compatible"
+        app:scaleType="fillCenter" />
+    <View
+        android:layout_width="0dp"
+        android:layout_height="110dp"
+        android:background="@drawable/bg_camera_gradient"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" />
+    <!-- Nút Flash -->
+    <ImageView
+        android:id="@+id/btnFlash"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginStart="16dp"
+        android:layout_marginTop="16dp"
+        android:background="@drawable/bg_camera_glass"
+        android:padding="8dp"
+        android:src="@drawable/ic_flash"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:tint="@color/white"
+        android:contentDescription="Bật hoặc tắt đèn flash" />
+    <!-- Toggle Chế độ [ OCR | Ảnh ] -->
     <LinearLayout
-        android:id="@+id/layoutSavedToast"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginBottom="85dp"
-        android:background="@drawable/bg_saved_toast"
+        android:id="@+id/toggleMode"
+        android:layout_width="172dp"
+        android:layout_height="40dp"
+        android:layout_marginTop="19dp"
+        android:background="@drawable/bg_camera_mode"
         android:gravity="center_vertical"
         android:orientation="horizontal"
-        android:paddingHorizontal="16dp"
-        android:paddingVertical="12dp"
-        android:visibility="gone"
-        app:layout_constraintBottom_toBottomOf="parent"
-        tools:visibility="visible">
-
-        <TextView
-            android:layout_width="28dp"
-            android:layout_height="28dp"
-            android:background="@drawable/bg_badge_notification"
-            android:backgroundTint="@color/tiu_income"
-            android:gravity="center"
-            android:text="✓"
-            android:textColor="@color/white"
-            android:textSize="14sp"
-            android:textStyle="bold" />
-
-        <LinearLayout
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="12dp"
-            android:layout_weight="1"
-            android:orientation="vertical">
-
-            <TextView
-                android:id="@+id/tvSavedAmount"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Đã lưu 85.000₫"
-                android:textAppearance="@style/TextAppearance.Tiu.Label"
-                android:textColor="@color/white" />
-
-            <TextView
-                android:id="@+id/tvSavedCategory"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Ăn uống · vào nhật ký hôm nay"
-                android:textAppearance="@style/TextAppearance.Tiu.Caption"
-                android:textColor="#CCFFFFFF" />
-        </LinearLayout>
-
-        <TextView
-            android:id="@+id/btnUndo"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:clickable="true"
-            android:focusable="true"
-            android:padding="8dp"
-            android:text="Hoàn tác"
-            android:textAppearance="@style/TextAppearance.Tiu.Label"
-            android:textColor="@color/tiu_orange_pastel" />
+        android:padding="3dp"
+        app:layout_constraintEnd_toStartOf="@id/btnZoom"
+        app:layout_constraintStart_toEndOf="@id/btnFlash"
+        app:layout_constraintTop_toTopOf="parent">
+      <TextView
+          android:id="@+id/tabOcr"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:background="@android:color/transparent"
+          android:gravity="center"
+          android:paddingHorizontal="4dp"
+          android:text="OCR"
+          android:textAppearance="@style/TextAppearance.Tiu.Label"
+          android:textColor="@color/white"
+          android:textSize="12sp"
+          android:layout_weight="1"
+          android:contentDescription="Quét hóa đơn OCR"
+          android:drawableStart="@drawable/ic_camera_scan"
+          android:drawablePadding="4dp" />
+      <TextView
+          android:id="@+id/tabPhoto"
+          android:layout_width="0dp"
+          android:layout_height="match_parent"
+          android:gravity="center"
+          android:paddingHorizontal="4dp"
+          android:text="Ảnh"
+          android:textAppearance="@style/TextAppearance.Tiu.Label"
+          android:textColor="@color/tiu_ink"
+          android:textSize="12sp"
+          android:layout_weight="1"
+          android:background="@android:color/transparent"
+          android:contentDescription="Chụp ảnh"
+          android:drawableStart="@drawable/ic_camera_photo"
+          android:drawablePadding="4dp" />
     </LinearLayout>
-
+    <!-- Nút Zoom 1x -->
+    <TextView
+        android:id="@+id/btnZoom"
+        android:layout_width="46dp"
+        android:layout_height="46dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="16dp"
+        android:background="@drawable/bg_camera_glass"
+        android:gravity="center"
+        android:text="1×"
+        android:textColor="@color/white"
+        android:textSize="13sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <!-- Khung quét nét đứt lấy nét hóa đơn -->
+    <View
+        android:id="@+id/viewReceiptFrame"
+        android:layout_width="64dp"
+        android:layout_height="64dp"
+        android:background="@drawable/ic_camera_focus"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+    <View
+        android:id="@+id/viewOcrFrame"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginHorizontal="28dp"
+        android:layout_marginTop="88dp"
+        android:layout_marginBottom="80dp"
+        android:background="@drawable/bg_receipt_scan_frame"
+        android:visibility="gone"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent" android:alpha="0.35" />
+    <!-- Nhãn "Đang quét hóa đơn..." -->
+    <TextView
+        android:id="@+id/badgeScanning"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="12dp"
+        android:background="@drawable/bg_receipt_scan_badge"
+        android:paddingHorizontal="14dp"
+        android:paddingVertical="5dp"
+        android:text="Đang quét hóa đơn…"
+        android:textAppearance="@style/TextAppearance.Tiu.Caption"
+        android:textColor="@color/tiu_orange"
+        android:textStyle="bold"
+        app:layout_constraintTop_toBottomOf="@id/viewOcrFrame"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        android:visibility="gone" />
+    <!-- Dòng hướng dẫn -->
+    <TextView
+        android:id="@+id/tvInstructionSubtitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="4dp"
+        android:text="Chạm để lấy nét"
+        android:textAppearance="@style/TextAppearance.Tiu.Caption"
+        android:textColor="#CCFFFFFF"
+        app:layout_constraintBottom_toTopOf="@id/tvInstructionTitle"
+        app:layout_constraintStart_toStartOf="parent" android:visibility="gone" />
+    <TextView
+        android:id="@+id/tvInstructionTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="20dp"
+        android:layout_marginBottom="18dp"
+        android:text="Chụp món đồ hoặc hóa đơn"
+        android:textAppearance="@style/TextAppearance.Tiu.Label"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" android:visibility="gone" />
+  </androidx.constraintlayout.widget.ConstraintLayout>
+  <!-- Cụm điều khiển chụp bên dưới Camera -->
+  <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/bottomControls"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginBottom="68dp"
+      android:paddingHorizontal="44dp"
+      app:layout_constraintBottom_toBottomOf="parent">
+    <!-- Nút Thư viện ảnh -->
+    <ImageView
+        android:id="@+id/btnGallery"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="Thư viện ảnh"
+        android:src="@null"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="0dp"
+        android:background="@drawable/bg_photo_empty"
+        android:rotation="0"
+        android:scaleType="centerCrop" />
+    <!-- Nút Chụp tròn Shutter lớn -->
+    <View
+        android:id="@+id/btnShutter"
+        android:layout_width="93dp"
+        android:layout_height="94dp"
+        android:background="@drawable/bg_shutter"
+        android:clickable="true"
+        android:focusable="true"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:contentDescription="Chụp ảnh" />
+    <!-- Nút Đảo camera -->
+    <ImageView
+        android:id="@+id/btnFlipCamera"
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:contentDescription="Lật camera"
+        android:src="@drawable/ic_flip_camera"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        android:padding="14dp"
+        android:background="?attr/selectableItemBackgroundBorderless" />
+  </androidx.constraintlayout.widget.ConstraintLayout>
+  <!-- Floating Toast "Đã lưu 85.000₫" dạng Doodle nổi (Main đã lưu.png) -->
+  <LinearLayout
+      android:id="@+id/layoutSavedToast"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginHorizontal="20dp"
+      android:layout_marginBottom="85dp"
+      android:background="@drawable/bg_saved_toast"
+      android:gravity="center_vertical"
+      android:orientation="horizontal"
+      android:paddingHorizontal="16dp"
+      android:paddingVertical="12dp"
+      android:visibility="gone"
+      app:layout_constraintBottom_toBottomOf="parent"
+      tools:visibility="visible">
+    <TextView
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:background="@drawable/bg_badge_notification"
+        android:backgroundTint="@color/tiu_income"
+        android:gravity="center"
+        android:text="✓"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="bold" />
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="12dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+      <TextView
+          android:id="@+id/tvSavedAmount"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Đã lưu 85.000₫"
+          android:textAppearance="@style/TextAppearance.Tiu.Label"
+          android:textColor="@color/white" />
+      <TextView
+          android:id="@+id/tvSavedCategory"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="Ăn uống · vào nhật ký hôm nay"
+          android:textAppearance="@style/TextAppearance.Tiu.Caption"
+          android:textColor="#CCFFFFFF" />
+    </LinearLayout>
+    <TextView
+        android:id="@+id/btnUndo"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:clickable="true"
+        android:focusable="true"
+        android:padding="8dp"
+        android:text="Hoàn tác"
+        android:textAppearance="@style/TextAppearance.Tiu.Label"
+        android:textColor="@color/tiu_orange_pastel" />
+  </LinearLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

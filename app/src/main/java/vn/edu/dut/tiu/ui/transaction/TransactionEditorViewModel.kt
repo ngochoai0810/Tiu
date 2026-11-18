@@ -13,6 +13,10 @@ import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.Job
+import kotlinx.coroutines.CancellationException
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.coroutines.tasks.await
 import android.graphics.Bitmap
 import android.net.Uri
@@ -30,6 +34,8 @@ import vn.edu.dut.tiu.data.model.Transaction
 import vn.edu.dut.tiu.data.model.TransactionType
 import vn.edu.dut.tiu.data.repository.CategoryRepository
 import vn.edu.dut.tiu.data.repository.TransactionRepository
+import vn.edu.dut.tiu.domain.ReceiptAmountParser
+import vn.edu.dut.tiu.domain.ReceiptLine
 import vn.edu.dut.tiu.domain.TransactionValidator
 import vn.edu.dut.tiu.ui.common.toUserMessage
 
@@ -56,6 +62,9 @@ class TransactionEditorViewModel(
         val imageUri: String? = null,
         val isOcrMode: Boolean = false,
         val ocrAmount: String? = null,
+        val ocrText: String? = null,
+        val isRecognizing: Boolean = false,
+        val ocrError: String? = null,
         val isUploadingImage: Boolean = false,
         val errors: Map<TransactionValidator.Field, String> = emptyMap(),
         val isSaving: Boolean = false,
@@ -67,11 +76,16 @@ class TransactionEditorViewModel(
         data class Error(val message: String) : Event
     }
 
+    private var ocrJob: Job? = null
+    var ocrPrefillConsumed = false
+        private set
+
     private var allCategories: List<Category> = emptyList()
     private var selectedCategoryId: String? = null
 
     /** Fragment chỉ điền sẵn form một lần (kể cả khi xoay màn hình). */
     var prefillConsumed = false
+    var imageArgumentConsumed = false
 
     private val _state = MutableStateFlow(UiState(isEditing = transactionId != null, dateMillis = now()))
     val state: StateFlow<UiState> = _state.asStateFlow()
@@ -133,11 +147,17 @@ class TransactionEditorViewModel(
     }
 
     fun setImage(uri: String?, isOcrMode: Boolean = false) {
-        _state.update { it.copy(imageUri = uri, isOcrMode = isOcrMode) }
+        if (_state.value.imageUri == uri && _state.value.isOcrMode == isOcrMode) return
+        ocrJob?.cancel()
+        ocrPrefillConsumed = false
+        _state.update {
+            it.copy(imageUri = uri, isOcrMode = isOcrMode, ocrAmount = null,
+                ocrText = null, isRecognizing = false, ocrError = null)
+        }
     }
-    
-    fun setOcrAmount(amountText: String) {
-        _state.update { it.copy(ocrAmount = amountText) }
+
+    fun consumeOcrPrefill() {
+        ocrPrefillConsumed = true
     }
 
     fun setDate(millis: Long) {
@@ -251,46 +271,39 @@ class TransactionEditorViewModel(
     }
 
     fun performOcr(context: android.content.Context, uriString: String) {
-        if (!_state.value.isOcrMode) return
-        
-        viewModelScope.launch {
+        val state = _state.value
+        if (!state.isOcrMode || state.imageUri != uriString || state.isRecognizing ||
+            state.ocrText != null || state.ocrError != null) return
+        val appContext = context.applicationContext
+        _state.update { it.copy(isRecognizing = true, ocrError = null) }
+        ocrJob = viewModelScope.launch {
+            val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
             try {
-                val uri = Uri.parse(uriString)
-                val image = InputImage.fromFilePath(context, uri)
-                val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
-                
-                recognizer.process(image)
-                    .addOnSuccessListener { visionText ->
-                        val result = extractAmountFromText(visionText.text)
-                        if (result != null) {
-                            setOcrAmount(result)
-                        }
+                val image = withContext(Dispatchers.IO) {
+                    InputImage.fromFilePath(appContext, Uri.parse(uriString))
+                }
+                val result = recognizer.process(image).await()
+                val lines = result.textBlocks.flatMap { it.lines }.mapNotNull { line ->
+                    line.boundingBox?.let { box ->
+                        ReceiptLine(line.text, box.left, box.top, box.right, box.bottom)
                     }
-                    .addOnFailureListener { e ->
-                        // Lỗi nhận diện
-                        e.printStackTrace()
-                    }
+                }
+                val amount = ReceiptAmountParser.extract(lines)?.toString()
+                _state.update {
+                    it.copy(ocrText = result.text, ocrAmount = amount,
+                        isRecognizing = false, ocrError = null)
+                }
+            } catch (e: CancellationException) {
+                throw e
             } catch (e: Exception) {
-                e.printStackTrace()
+                _state.update {
+                    it.copy(isRecognizing = false,
+                        ocrError = "Không đọc được ảnh hóa đơn. Bạn có thể nhập số tiền thủ công.")
+                }
+            } finally {
+                recognizer.close()
             }
         }
-    }
-    
-    private fun extractAmountFromText(text: String): String? {
-        // Tìm các cụm số có dạng "120.000", "150,000", "50000"
-        val regex = Regex("""\b\d{1,3}(?:[.,]\d{3})*(?:[.,]\d{2})?\b""")
-        val matches = regex.findAll(text).map { it.value }.toList()
-        
-        if (matches.isEmpty()) return null
-        
-        // Chọn số lớn nhất hợp lý (loại trừ các số quá nhỏ như ngày tháng)
-        val validAmounts = matches.mapNotNull { 
-            val clean = it.replace(".", "").replace(",", "")
-            clean.toLongOrNull()
-        }.filter { it > 1000 } // Giả sử hoá đơn thường > 1000đ
-        
-        val maxAmount = validAmounts.maxOrNull() ?: return null
-        return maxAmount.toString()
     }
 
     fun delete() {

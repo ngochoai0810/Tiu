@@ -19,16 +19,13 @@
             android:orientation="vertical"
             android:padding="24dp">
 
-            <TextView
-                android:layout_width="64dp"
+            <ImageView
+                android:layout_width="80dp"
                 android:layout_height="64dp"
                 android:layout_marginBottom="24dp"
-                android:background="@drawable/bg_doodle_circle"
-                android:gravity="center"
-                android:text="t"
-                android:textColor="@color/tiu_ink"
-                android:textSize="28sp"
-                android:textStyle="bold" />
+                android:importantForAccessibility="no"
+                android:scaleType="fitStart"
+                android:src="@drawable/tiu_welcome_logo" />
 
             <TextView
                 android:layout_width="wrap_content"
@@ -99,17 +96,21 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="newPassword"
-                android:hint="Tối thiểu 8 ký tự"
+                android:hint="Từ 6 đến 8 ký tự"
                 android:inputType="textPassword" />
 
-            <!-- Hidden field to keep code working -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="6dp"
+                android:text="@string/hint_password_confirm"
+                android:textAppearance="@style/TextAppearance.Tiu.Label" />
             <EditText
                 android:id="@+id/inputConfirm"
                 style="@style/Widget.Tiu.Input"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="12dp"
-                android:visibility="gone"
                 android:autofillHints="newPassword"
                 android:hint="@string/hint_password_confirm"
                 android:inputType="textPassword" />

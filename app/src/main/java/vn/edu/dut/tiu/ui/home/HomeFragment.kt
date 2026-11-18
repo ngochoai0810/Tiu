@@ -9,7 +9,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
-import androidx.core.content.ContextCompat
+import androidx.appcompat.app.AlertDialog
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -41,6 +41,9 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
     }
 
+    private var photoDialog: AlertDialog? = null
+    private var viewingTransactionId: String? = null
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val b = FragmentHomeBinding.bind(view)
         // Set setup default
@@ -50,7 +53,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             findNavController().navigate(R.id.searchFragment)
         }
 
-        val calendarAdapter = CalendarAdapter()
+        val calendarAdapter = CalendarAdapter(::openDay)
         b.recyclerCalendar.adapter = calendarAdapter
 
         b.btnPrevMonth.setOnClickListener { vm.previousMonth() }
@@ -62,6 +65,10 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             b.btnTabPhoto.setBackgroundResource(0)
             b.btnTabPhoto.setTextColor(resources.getColor(R.color.tiu_text_secondary, null))
             calendarAdapter.setPhotoMode(false)
+            b.tvEyebrow.text = "LỊCH CHI TIÊU"
+            b.calendarSummary.visibility = View.VISIBLE
+            b.expenseLegend.visibility = View.VISIBLE
+            b.summaryDivider.visibility = View.VISIBLE
         }
 
         b.btnTabPhoto.setOnClickListener {
@@ -70,9 +77,17 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             b.btnTabCalendar.setBackgroundResource(0)
             b.btnTabCalendar.setTextColor(resources.getColor(R.color.tiu_text_secondary, null))
             calendarAdapter.setPhotoMode(true)
+            b.tvEyebrow.text = "NHẬT KÝ ẢNH"
+            b.calendarSummary.visibility = View.GONE
+            b.expenseLegend.visibility = View.GONE
+            b.summaryDivider.visibility = View.GONE
         }
 
         collectOnStarted(vm.state) { s ->
+            val selectedId = viewingTransactionId
+            if (selectedId != null && !s.loading && s.items.filterIsInstance<HomeItem.Row>().none { it.transaction.id == selectedId }) {
+                photoDialog?.dismiss()
+            }
             b.textMonth.text = s.monthLabel
             b.btnNextMonth.alpha = if (s.canGoNext) 1f else 0.3f
 
@@ -95,9 +110,82 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
         }
         collectOnStarted(vm.messages) { msg -> Snackbar.make(view, msg, Snackbar.LENGTH_SHORT).show() }
     }
+    private fun openDay(date: LocalDate, photoMode: Boolean) {
+        val transactions = vm.state.value.items.filterIsInstance<HomeItem.Row>()
+            .map { it.transaction }
+            .filter { DateUtils.toLocalDate(it.date) == date && (!photoMode || !it.imageUrl.isNullOrBlank()) }
+        if (transactions.isEmpty()) {
+            view?.let { Snackbar.make(it, if (photoMode) "Ngày này chưa có ảnh" else "Ngày này chưa có giao dịch", Snackbar.LENGTH_SHORT).show() }
+            return
+        }
+        fun open(transaction: Transaction) {
+            if (photoMode) {
+                showPhoto(transaction)
+            } else {
+                findNavController().navigate(R.id.transactionEditorFragment, Bundle().apply {
+                    putString("transactionId", transaction.id)
+                })
+            }
+        }
+        if (transactions.size == 1) {
+            open(transactions.single())
+            return
+        }
+        val labels = transactions.map {
+            "${it.categoryName} · ${MoneyFormat.format(it.amount)}${it.note.takeIf(String::isNotBlank)?.let { note -> " · $note" }.orEmpty()}"
+        }.toTypedArray()
+        MaterialAlertDialogBuilder(requireContext())
+            .setTitle("${date.dayOfMonth}/${date.monthValue}/${date.year}")
+            .setItems(labels) { _, index -> open(transactions[index]) }
+            .setNegativeButton("Đóng", null)
+            .show()
+    }
+
+    private fun showPhoto(transaction: Transaction) {
+        val imageUrl = transaction.imageUrl ?: return
+        photoDialog?.dismiss()
+        val image = ImageView(requireContext()).apply {
+            layoutParams = ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT,
+                (resources.displayMetrics.heightPixels * 0.55f).toInt())
+            scaleType = ImageView.ScaleType.FIT_CENTER
+            contentDescription = "Ảnh ${transaction.categoryName} · ${MoneyFormat.format(transaction.amount)}"
+        }
+        val source: Any = if (imageUrl.startsWith("data:image")) {
+            try {
+                Base64.decode(imageUrl.substringAfter(","), Base64.DEFAULT)
+            } catch (_: IllegalArgumentException) {
+                view?.let { Snackbar.make(it, "Không đọc được ảnh giao dịch", Snackbar.LENGTH_SHORT).show() }
+                return
+            }
+        } else Uri.parse(imageUrl)
+        val dialog = MaterialAlertDialogBuilder(requireContext())
+            .setTitle("${transaction.categoryName} · ${MoneyFormat.format(transaction.amount)}")
+            .setView(image)
+            .setNegativeButton("Đóng", null)
+            .create()
+        dialog.setOnDismissListener {
+            Glide.with(image).clear(image)
+            if (photoDialog === dialog) {
+                photoDialog = null
+                viewingTransactionId = null
+            }
+        }
+        viewingTransactionId = transaction.id
+        photoDialog = dialog
+        dialog.show()
+        Glide.with(image).load(source).error(R.drawable.bg_photo_empty).into(image)
+    }
+
+    override fun onDestroyView() {
+        photoDialog?.dismiss()
+        photoDialog = null
+        viewingTransactionId = null
+        super.onDestroyView()
+    }
+
 }
 
-class CalendarAdapter : RecyclerView.Adapter<CalendarAdapter.VH>() {
+class CalendarAdapter(private val onDayClick: (LocalDate, Boolean) -> Unit) : RecyclerView.Adapter<CalendarAdapter.VH>() {
     private var items: List<LocalDate?> = emptyList()
     private var expenseByDate: Map<LocalDate, Long> = emptyMap()
     private var photoByDate: Map<LocalDate, String> = emptyMap()
@@ -125,95 +213,63 @@ class CalendarAdapter : RecyclerView.Adapter<CalendarAdapter.VH>() {
     }
 
     override fun onBindViewHolder(holder: VH, position: Int) {
-        val date = items[position]
-        if (date == null) {
-            Glide.with(holder.itemView.context).clear(holder.b.imgPhoto)
-            holder.b.tvDay.text = ""
-            holder.b.dot.visibility = View.GONE
-            holder.b.imgPhoto.visibility = View.GONE
-            holder.b.dayContainer.setBackgroundColor(Color.TRANSPARENT)
-        } else {
-            val amount = expenseByDate[date] ?: 0L
-            val photoUrl = photoByDate[date]
+        val b = holder.b
+        val context = holder.itemView.context
+        Glide.with(context).clear(b.imgPhoto)
+        b.imgPhoto.setImageDrawable(null)
+        b.imgPhoto.visibility = View.GONE
+        b.tvDay.visibility = View.GONE
+        b.dot.visibility = View.GONE
+        b.dayContainer.backgroundTintList = null
+        b.dayContainer.setBackgroundColor(Color.TRANSPARENT)
 
-            if (isPhotoMode) {
-                if (photoUrl != null) {
-                    holder.b.tvDay.visibility = View.GONE
-                    holder.b.dot.visibility = View.GONE
-                    holder.b.imgPhoto.visibility = View.VISIBLE
-                    holder.b.dayContainer.setBackgroundResource(R.drawable.bg_doodle_circle)
-                    holder.b.dayContainer.backgroundTintList = null
-
-                    val context = holder.itemView.context
-                    val density = context.resources.displayMetrics.density
-                    val cornerPx = (12 * density).toInt()
-
-                    holder.b.imgPhoto.imageTintList = null
-                    holder.b.imgPhoto.setPadding(0, 0, 0, 0)
-                    holder.b.imgPhoto.scaleType = ImageView.ScaleType.CENTER_CROP
-
-                    if (photoUrl.startsWith("data:image")) {
-                        try {
-                            val base64Data = photoUrl.substringAfter(",")
-                            val bytes = Base64.decode(base64Data, Base64.DEFAULT)
-                            Glide.with(context)
-                                .load(bytes)
-                                .transform(CenterCrop(), RoundedCorners(cornerPx))
-                                .into(holder.b.imgPhoto)
-                        } catch (e: Exception) {
-                            holder.b.imgPhoto.setImageResource(R.drawable.ic_camera)
-                        }
-                    } else {
-                        Glide.with(context)
-                            .load(Uri.parse(photoUrl))
-                            .transform(CenterCrop(), RoundedCorners(cornerPx))
-                            .placeholder(R.drawable.ic_camera)
-                            .error(R.drawable.ic_camera)
-                            .into(holder.b.imgPhoto)
-                    }
-                } else if (amount > 0) {
-                    Glide.with(holder.itemView.context).clear(holder.b.imgPhoto)
-                    val context = holder.itemView.context
-                    val pad = (6 * context.resources.displayMetrics.density).toInt()
-                    holder.b.imgPhoto.setPadding(pad, pad, pad, pad)
-                    holder.b.imgPhoto.setImageResource(R.drawable.ic_camera)
-                    holder.b.imgPhoto.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.tiu_ink))
-                    holder.b.imgPhoto.visibility = View.VISIBLE
-                    holder.b.tvDay.visibility = View.GONE
-                    holder.b.dot.visibility = View.GONE
-                    holder.b.dayContainer.setBackgroundResource(R.drawable.bg_doodle_circle)
-                    holder.b.dayContainer.backgroundTintList = null
-                } else {
-                    Glide.with(holder.itemView.context).clear(holder.b.imgPhoto)
-                    holder.b.imgPhoto.visibility = View.GONE
-                    holder.b.tvDay.visibility = View.VISIBLE
-                    holder.b.tvDay.text = date.dayOfMonth.toString()
-                    holder.b.dot.visibility = View.GONE
-                    holder.b.dayContainer.setBackgroundResource(R.drawable.bg_doodle_circle)
-                    holder.b.dayContainer.backgroundTintList = null
+        holder.itemView.setOnClickListener(null)
+        val date = items[position] ?: return
+        holder.itemView.setOnClickListener { onDayClick(date, isPhotoMode) }
+        val amount = expenseByDate[date] ?: 0L
+        if (isPhotoMode) {
+            b.dayContainer.setBackgroundResource(R.drawable.bg_photo_empty)
+            b.dayContainer.contentDescription = "Ngày ${date.dayOfMonth}, chưa có ảnh"
+            val photoUrl = photoByDate[date]?.takeIf { it.isNotBlank() } ?: return
+            b.imgPhoto.visibility = View.VISIBLE
+            b.imgPhoto.imageTintList = null
+            b.imgPhoto.setPadding(0, 0, 0, 0)
+            b.imgPhoto.scaleType = ImageView.ScaleType.CENTER_CROP
+            val imageSource: Any = if (photoUrl.startsWith("data:image")) {
+                try {
+                    Base64.decode(photoUrl.substringAfter(","), Base64.DEFAULT)
+                } catch (_: IllegalArgumentException) {
+                    b.imgPhoto.visibility = View.GONE
+                    return
                 }
             } else {
-                Glide.with(holder.itemView.context).clear(holder.b.imgPhoto)
-                holder.b.imgPhoto.visibility = View.GONE
-                holder.b.tvDay.visibility = View.VISIBLE
-                holder.b.tvDay.text = date.dayOfMonth.toString()
-
-                if (amount > 0) {
-                    holder.b.dot.visibility = View.VISIBLE
-                    val intensity = amount.toFloat() / (if (maxAmount > 0) maxAmount else 1)
-                    val color = when {
-                        intensity > 0.6f -> Color.parseColor("#E85D45")
-                        intensity > 0.3f -> Color.parseColor("#FFAD66")
-                        else -> Color.parseColor("#FFD8B5")
-                    }
-                    holder.b.dayContainer.setBackgroundResource(R.drawable.bg_doodle_circle)
-                    holder.b.dayContainer.backgroundTintList = ColorStateList.valueOf(color)
-                } else {
-                    holder.b.dot.visibility = View.GONE
-                    holder.b.dayContainer.setBackgroundResource(R.drawable.bg_doodle_circle)
-                    holder.b.dayContainer.backgroundTintList = null
-                }
+                Uri.parse(photoUrl)
             }
+            b.dayContainer.contentDescription = "Ảnh chi tiêu ngày ${date.dayOfMonth}"
+            val cornerPx = (10 * context.resources.displayMetrics.density).toInt()
+            Glide.with(context)
+                .load(imageSource)
+                .transform(CenterCrop(), RoundedCorners(cornerPx))
+                .placeholder(R.drawable.bg_photo_empty)
+                .error(R.drawable.bg_photo_empty)
+                .into(b.imgPhoto)
+            return
+        }
+
+        b.dayContainer.contentDescription = "Ngày ${date.dayOfMonth}, ${MoneyFormat.format(amount)}"
+        b.tvDay.visibility = View.VISIBLE
+        b.tvDay.text = date.dayOfMonth.toString()
+        b.dayContainer.setBackgroundResource(R.drawable.bg_calendar_day)
+        val intensity = amount.toFloat() / maxAmount.coerceAtLeast(1L)
+        b.tvDay.setTextColor(Color.parseColor(if (amount > 0 && intensity > 0.6f) "#FFFFFF" else "#4A3427"))
+        if (amount > 0) {
+            b.dot.visibility = View.VISIBLE
+            val color = when {
+                intensity > 0.6f -> "#E85D45"
+                intensity > 0.3f -> "#FFAD66"
+                else -> "#FFD8B5"
+            }
+            b.dayContainer.backgroundTintList = ColorStateList.valueOf(Color.parseColor(color))
         }
     }
 

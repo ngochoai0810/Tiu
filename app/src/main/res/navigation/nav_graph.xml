@@ -3,7 +3,21 @@
 <navigation xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:id="@+id/nav_graph"
-    app:startDestination="@id/loginFragment">
+    app:startDestination="@id/onboardingStep1Fragment">
+
+    <fragment
+        android:id="@+id/onboardingStep1Fragment"
+        android:name="vn.edu.dut.tiu.ui.auth.OnboardingStep1Fragment"
+        android:label="Bắt đầu 1">
+        <action
+            android:id="@+id/action_onboardingStep1_to_notificationOnboarding"
+            app:destination="@id/notificationOnboardingFragment" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/notificationOnboardingFragment"
+        android:name="vn.edu.dut.tiu.ui.auth.NotificationOnboardingFragment"
+        android:label="Bắt đầu 2" />
 
     <fragment
         android:id="@+id/loginFragment"
@@ -29,7 +43,7 @@
         android:id="@+id/searchFragment"
         android:name="vn.edu.dut.tiu.ui.home.SearchFragment" />
 
-    <fragment
+    <dialog
         android:id="@+id/transactionEditorFragment"
         android:name="vn.edu.dut.tiu.ui.transaction.TransactionEditorFragment"
         android:label="Giao dịch">
@@ -38,7 +52,7 @@
             android:defaultValue="@null"
             app:argType="string"
             app:nullable="true" />
-    </fragment>
+    </dialog>
 
     <fragment
         android:id="@+id/statsFragment"

@@ -137,6 +137,13 @@
     </style>
 
     <style name="Widget.Tiu.BottomNav.Indicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
-        <item name="android:color">@color/tiu_orange_pastel</item>
+        <item name="android:color">@android:color/transparent</item>
+        <item name="android:width">56dp</item>
+        <item name="android:height">56dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Tiu.NavigationIndicator</item>
+    </style>
+    <style name="ShapeAppearance.Tiu.NavigationIndicator" parent="">
+        <item name="cornerFamily">rounded</item>
+        <item name="cornerSize">50%</item>
     </style>
 </resources>

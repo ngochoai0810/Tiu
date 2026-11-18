@@ -101,9 +101,9 @@ class BudgetFragment : Fragment(R.layout.fragment_budget) {
             }
             d.fieldCategory.setOnClickListener {
                 MaterialAlertDialogBuilder(requireContext())
-                    .setItems(options.map { "${it.icon}  ${it.name}" }.toTypedArray()) { _, i ->
+                    .setItems(options.map { "${it.icon} ${it.name}".trim() }.toTypedArray()) { _, i ->
                         chosen = options[i]
-                        d.fieldCategory.text = "${options[i].icon} ${options[i].name}"
+                        d.fieldCategory.text = "${options[i].icon} ${options[i].name}".trim()
                     }.show()
             }
         } else {
@@ -152,11 +152,15 @@ private class BudgetAdapter(
         val ctx = holder.b.root.context
         holder.b.textName.text = "${item.icon} ${item.name}".trim()
         holder.b.textSpent.text = MoneyFormat.format(p.spent)
-        holder.b.progress.progress = p.percent.coerceAtMost(100)
+        holder.b.progress.progress = p.percent.coerceIn(0, 100)
         holder.b.progress.setIndicatorColor(
-            ContextCompat.getColor(ctx, if (p.status == BudgetProgress.Status.OK) R.color.tiu_orange else R.color.tiu_expense)
+            ContextCompat.getColor(ctx, when {
+                p.status != BudgetProgress.Status.OK -> R.color.tiu_expense
+                p.percent <= 40 -> R.color.tiu_income
+                else -> R.color.tiu_orange_pastel
+            })
         )
-        holder.b.textPercent.text = "${p.percent}%"
+        holder.b.textPercent.text = "${p.percent}% đã dùng"
         if (p.status == BudgetProgress.Status.OVER) {
             holder.b.badgeWarning.visibility = View.VISIBLE
             holder.b.badgeWarning.text = "Vượt mức"

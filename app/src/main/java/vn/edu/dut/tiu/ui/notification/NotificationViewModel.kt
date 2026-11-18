@@ -26,7 +26,7 @@ class NotificationViewModel(
             else -> list
         }
         val unreadCount = list.count { !it.isRead }
-        NotificationUiState(filtered, unreadCount, tab)
+        NotificationUiState(filtered, unreadCount, tab, list.size)
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NotificationUiState())
 
     init {
@@ -57,5 +57,6 @@ class NotificationViewModel(
 data class NotificationUiState(
     val list: List<Notification> = emptyList(),
     val unreadCount: Int = 0,
-    val filterTab: Int = 0
+    val filterTab: Int = 0,
+    val totalCount: Int = 0,
 )

@@ -228,6 +228,7 @@
                 tools:listitem="@layout/item_day_calendar" />
 
             <LinearLayout
+                android:id="@+id/expenseLegend"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="end"
@@ -274,6 +275,7 @@
             </LinearLayout>
 
             <View
+                android:id="@+id/summaryDivider"
                 android:layout_width="match_parent"
                 android:layout_height="1dp"
                 android:layout_marginTop="16dp"
@@ -282,6 +284,7 @@
                 android:layerType="software" />
 
             <LinearLayout
+                android:id="@+id/calendarSummary"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">

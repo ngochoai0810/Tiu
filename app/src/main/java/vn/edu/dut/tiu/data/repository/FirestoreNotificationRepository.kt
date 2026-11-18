@@ -27,7 +27,12 @@ class FirestoreNotificationRepository(
                     return@addSnapshotListener
                 }
                 if (snapshot != null) {
-                    val notifications = snapshot.documents.mapNotNull { it.toObject(Notification::class.java) }
+                    val notifications = snapshot.documents.mapNotNull { doc ->
+                        doc.toObject(Notification::class.java)?.copy(
+                            id = doc.id,
+                            isRead = doc.getBoolean("isRead") ?: doc.getBoolean("read") ?: false
+                        )
+                    }
                     trySend(notifications)
                 }
             }
@@ -39,7 +44,9 @@ class FirestoreNotificationRepository(
     }
 
     override suspend fun markAllAsRead() {
-        val unreadDocs = collection().whereEqualTo("isRead", false).get().await()
+        val unreadDocs = collection().get().await().documents.filter { doc ->
+            !(doc.getBoolean("isRead") ?: doc.getBoolean("read") ?: false)
+        }
         db.runBatch { batch ->
             for (doc in unreadDocs) {
                 batch.update(doc.reference, "isRead", true)

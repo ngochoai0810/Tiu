@@ -16,6 +16,8 @@ import com.google.firebase.auth.FirebaseAuthInvalidUserException
 import com.google.firebase.auth.FirebaseAuthUserCollisionException
 import com.google.firebase.auth.FirebaseAuthWeakPasswordException
 import com.google.firebase.firestore.FirebaseFirestoreException
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.retryWhen
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.launch
 import vn.edu.dut.tiu.R
@@ -81,6 +83,24 @@ fun LayoutTopBarBinding.setup(fragment: Fragment) {
     btnAdd.setOnClickListener { fragment.findNavController().navigate(R.id.transactionEditorFragment) }
     avatar.setOnClickListener { fragment.findNavController().navigate(R.id.accountFragment) }
     btnNotification.setOnClickListener { fragment.findNavController().navigate(R.id.notificationFragment) }
+    badgeNotification.visibility = View.GONE
+    fragment.collectOnStarted(
+        fragment.appContainer.notificationRepository.observeNotifications()
+            .retryWhen { _, _ ->
+                badgeNotification.visibility = View.GONE
+                delay(5_000)
+                true
+            }
+    ) { notifications ->
+        val unreadCount = notifications.count { !it.isRead }
+        badgeNotification.text = if (unreadCount > 99) "99+" else unreadCount.toString()
+        badgeNotification.visibility = if (unreadCount > 0) View.VISIBLE else View.GONE
+        btnNotification.contentDescription = if (unreadCount > 0) {
+            "Thông báo, $unreadCount chưa đọc"
+        } else {
+            "Thông báo"
+        }
+    }
 }
 
 /** Tự chèn dấu chấm phân cách hàng nghìn khi gõ số tiền: 85000 -> 85.000 */

@@ -12,6 +12,7 @@ import vn.edu.dut.tiu.databinding.FragmentAccountBinding
 import vn.edu.dut.tiu.ui.common.appContainer
 import vn.edu.dut.tiu.ui.common.collectOnStarted
 import vn.edu.dut.tiu.ui.common.initials
+import vn.edu.dut.tiu.ui.common.setup
 import vn.edu.dut.tiu.util.DateUtils
 import vn.edu.dut.tiu.util.MoneyFormat
 import java.time.YearMonth
@@ -21,6 +22,7 @@ class AccountFragment : Fragment(R.layout.fragment_account) {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val b = FragmentAccountBinding.bind(view)
+        b.topBar.setup(this)
         val auth = appContainer.authRepository
         b.textAvatar.text = initials(auth.currentDisplayName)
         b.textName.text = auth.currentDisplayName?.takeIf { it.isNotBlank() } ?: "Bạn"

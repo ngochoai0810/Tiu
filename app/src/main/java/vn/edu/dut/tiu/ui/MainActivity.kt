@@ -44,10 +44,10 @@ class MainActivity : AppCompatActivity() {
         val navHost = supportFragmentManager.findFragmentById(R.id.navHost) as NavHostFragment
         navController = navHost.navController
 
-        // Đã đăng nhập -> vào thẳng Nhật ký, chưa -> màn Đăng nhập.
+        // Đã đăng nhập -> vào thẳng Nhật ký, chưa -> màn Bắt đầu (Onboarding).
         val signedIn = (application as TiuApp).container.authRepository.currentUserId != null
         val graph = navController.navInflater.inflate(R.navigation.nav_graph)
-        graph.setStartDestination(if (signedIn) R.id.homeFragment else R.id.loginFragment)
+        graph.setStartDestination(if (signedIn) R.id.homeFragment else R.id.onboardingStep1Fragment)
         navController.setGraph(graph, null)
 
         binding.bottomNav.setupWithNavController(navController)

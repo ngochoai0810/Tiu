@@ -53,7 +53,7 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
                 val unreadText = if (s.unreadCount > 0) "${s.unreadCount} chưa đọc" else "0 chưa đọc"
                 b.textUnreadCount.text = unreadText
                 
-                b.tabAll.text = "Tất cả · ${s.list.size}"
+                b.tabAll.text = "Tất cả · ${s.totalCount}"
                 
                 adapter.submitList(s.list)
             }
