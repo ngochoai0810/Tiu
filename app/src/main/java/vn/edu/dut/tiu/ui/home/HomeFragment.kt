@@ -2,16 +2,23 @@ package vn.edu.dut.tiu.ui.home
 
 import android.content.res.ColorStateList
 import android.graphics.Color
+import android.net.Uri
 import android.os.Bundle
+import android.util.Base64
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.ImageView
+import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
 import androidx.lifecycle.viewmodel.initializer
 import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.recyclerview.widget.RecyclerView
+import com.bumptech.glide.Glide
+import com.bumptech.glide.load.resource.bitmap.CenterCrop
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners
 import com.google.android.material.dialog.MaterialAlertDialogBuilder
 import com.google.android.material.snackbar.Snackbar
 import vn.edu.dut.tiu.R
@@ -84,7 +91,7 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             val firstDayOfWeek = if (s.daysInMonth.isNotEmpty()) s.daysInMonth.first().dayOfWeek.value else 1
             val blanks = firstDayOfWeek - 1
             val calendarItems = List(blanks) { null } + s.daysInMonth
-            calendarAdapter.submitData(calendarItems, s.expenseByDate, s.maxExpenseAmount)
+            calendarAdapter.submitData(calendarItems, s.expenseByDate, s.photoByDate, s.maxExpenseAmount)
         }
         collectOnStarted(vm.messages) { msg -> Snackbar.make(view, msg, Snackbar.LENGTH_SHORT).show() }
     }
@@ -93,12 +100,14 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
 class CalendarAdapter : RecyclerView.Adapter<CalendarAdapter.VH>() {
     private var items: List<LocalDate?> = emptyList()
     private var expenseByDate: Map<LocalDate, Long> = emptyMap()
+    private var photoByDate: Map<LocalDate, String> = emptyMap()
     private var maxAmount: Long = 0L
     private var isPhotoMode: Boolean = false
 
-    fun submitData(days: List<LocalDate?>, expenses: Map<LocalDate, Long>, max: Long) {
+    fun submitData(days: List<LocalDate?>, expenses: Map<LocalDate, Long>, photos: Map<LocalDate, String>, max: Long) {
         items = days
         expenseByDate = expenses
+        photoByDate = photos
         maxAmount = max
         notifyDataSetChanged()
     }
@@ -118,21 +127,64 @@ class CalendarAdapter : RecyclerView.Adapter<CalendarAdapter.VH>() {
     override fun onBindViewHolder(holder: VH, position: Int) {
         val date = items[position]
         if (date == null) {
+            Glide.with(holder.itemView.context).clear(holder.b.imgPhoto)
             holder.b.tvDay.text = ""
             holder.b.dot.visibility = View.GONE
             holder.b.imgPhoto.visibility = View.GONE
             holder.b.dayContainer.setBackgroundColor(Color.TRANSPARENT)
         } else {
             val amount = expenseByDate[date] ?: 0L
+            val photoUrl = photoByDate[date]
 
             if (isPhotoMode) {
-                if (amount > 0) {
+                if (photoUrl != null) {
+                    holder.b.tvDay.visibility = View.GONE
+                    holder.b.dot.visibility = View.GONE
+                    holder.b.imgPhoto.visibility = View.VISIBLE
+                    holder.b.dayContainer.setBackgroundResource(R.drawable.bg_doodle_circle)
+                    holder.b.dayContainer.backgroundTintList = null
+
+                    val context = holder.itemView.context
+                    val density = context.resources.displayMetrics.density
+                    val cornerPx = (12 * density).toInt()
+
+                    holder.b.imgPhoto.imageTintList = null
+                    holder.b.imgPhoto.setPadding(0, 0, 0, 0)
+                    holder.b.imgPhoto.scaleType = ImageView.ScaleType.CENTER_CROP
+
+                    if (photoUrl.startsWith("data:image")) {
+                        try {
+                            val base64Data = photoUrl.substringAfter(",")
+                            val bytes = Base64.decode(base64Data, Base64.DEFAULT)
+                            Glide.with(context)
+                                .load(bytes)
+                                .transform(CenterCrop(), RoundedCorners(cornerPx))
+                                .into(holder.b.imgPhoto)
+                        } catch (e: Exception) {
+                            holder.b.imgPhoto.setImageResource(R.drawable.ic_camera)
+                        }
+                    } else {
+                        Glide.with(context)
+                            .load(Uri.parse(photoUrl))
+                            .transform(CenterCrop(), RoundedCorners(cornerPx))
+                            .placeholder(R.drawable.ic_camera)
+                            .error(R.drawable.ic_camera)
+                            .into(holder.b.imgPhoto)
+                    }
+                } else if (amount > 0) {
+                    Glide.with(holder.itemView.context).clear(holder.b.imgPhoto)
+                    val context = holder.itemView.context
+                    val pad = (6 * context.resources.displayMetrics.density).toInt()
+                    holder.b.imgPhoto.setPadding(pad, pad, pad, pad)
+                    holder.b.imgPhoto.setImageResource(R.drawable.ic_camera)
+                    holder.b.imgPhoto.imageTintList = ColorStateList.valueOf(ContextCompat.getColor(context, R.color.tiu_ink))
                     holder.b.imgPhoto.visibility = View.VISIBLE
                     holder.b.tvDay.visibility = View.GONE
                     holder.b.dot.visibility = View.GONE
                     holder.b.dayContainer.setBackgroundResource(R.drawable.bg_doodle_circle)
                     holder.b.dayContainer.backgroundTintList = null
                 } else {
+                    Glide.with(holder.itemView.context).clear(holder.b.imgPhoto)
                     holder.b.imgPhoto.visibility = View.GONE
                     holder.b.tvDay.visibility = View.VISIBLE
                     holder.b.tvDay.text = date.dayOfMonth.toString()
@@ -141,6 +193,7 @@ class CalendarAdapter : RecyclerView.Adapter<CalendarAdapter.VH>() {
                     holder.b.dayContainer.backgroundTintList = null
                 }
             } else {
+                Glide.with(holder.itemView.context).clear(holder.b.imgPhoto)
                 holder.b.imgPhoto.visibility = View.GONE
                 holder.b.tvDay.visibility = View.VISIBLE
                 holder.b.tvDay.text = date.dayOfMonth.toString()

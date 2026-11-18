@@ -5,6 +5,8 @@ import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.lifecycle.viewmodel.initializer
+import androidx.lifecycle.viewmodel.viewModelFactory
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import androidx.navigation.fragment.findNavController
@@ -13,12 +15,17 @@ import com.google.android.material.timepicker.TimeFormat
 import vn.edu.dut.tiu.R
 import vn.edu.dut.tiu.databinding.FragmentNotificationBinding
 import vn.edu.dut.tiu.databinding.FragmentNotificationSettingsBinding
+import vn.edu.dut.tiu.ui.common.appContainer
 import vn.edu.dut.tiu.worker.ReminderManager
 import java.util.Locale
 
 class NotificationFragment : Fragment(R.layout.fragment_notification) {
 
-    private val vm: NotificationViewModel by viewModels()
+    private val vm: NotificationViewModel by viewModels {
+        viewModelFactory {
+            initializer { NotificationViewModel(appContainer.notificationRepository) }
+        }
+    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         val b = FragmentNotificationBinding.bind(view)
@@ -33,14 +40,22 @@ class NotificationFragment : Fragment(R.layout.fragment_notification) {
         b.tabAll.setOnClickListener { vm.setFilterTab(0) }
         b.tabBudget.setOnClickListener { vm.setFilterTab(1) }
         b.tabReminder.setOnClickListener { vm.setFilterTab(2) }
+        
+        val adapter = NotificationAdapter { notification ->
+            // TODO: Xử lý click item nếu cần (đánh dấu đã đọc 1 item, mở màn hình chi tiết, ...)
+        }
+        b.recyclerNotifications.adapter = adapter
 
         viewLifecycleOwner.lifecycleScope.launch {
             vm.state.collectLatest { s ->
                 selectTab(b, s.filterTab)
-                b.textUnreadCount.text = "${s.unreadCount} chưa đọc"
                 
-                // (Thực tế sẽ dùng RecyclerView, ở đây tạm thời chỉ update text unread và style tab
-                // vì layout XML đang code cứng các View card thông báo)
+                val unreadText = if (s.unreadCount > 0) "${s.unreadCount} chưa đọc" else "0 chưa đọc"
+                b.textUnreadCount.text = unreadText
+                
+                b.tabAll.text = "Tất cả · ${s.list.size}"
+                
+                adapter.submitList(s.list)
             }
         }
     }

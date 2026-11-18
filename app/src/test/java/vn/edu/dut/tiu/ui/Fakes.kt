@@ -30,6 +30,8 @@ class FakeTransactionRepository(initial: List<Transaction> = emptyList()) : Tran
     private var nextId = 1
 
     override fun observeMonth(month: YearMonth): Flow<List<Transaction>> = items.map { it }
+    override fun observeRange(startMillis: Long, endMillis: Long): Flow<List<Transaction>> =
+        items.map { list -> list.filter { it.date in startMillis..endMillis } }
     override suspend fun get(id: String) = items.value.firstOrNull { it.id == id }
     override suspend fun add(transaction: Transaction): String {
         val id = "tx${nextId++}"

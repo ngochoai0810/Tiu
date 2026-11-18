@@ -40,6 +40,7 @@ data class HomeUiState(
     // Data for Calendar UI
     val daysInMonth: List<LocalDate> = emptyList(),
     val expenseByDate: Map<LocalDate, Long> = emptyMap(),
+    val photoByDate: Map<LocalDate, String> = emptyMap(),
     val maxExpenseDate: LocalDate? = null,
     val maxExpenseAmount: Long = 0L,
     val averageExpensePerDay: Long = 0L,
@@ -94,7 +95,12 @@ class HomeViewModel(
         val expenseByDate = expenseTransactions.groupBy { DateUtils.toLocalDate(it.date) }
             .mapValues { (_, list) -> list.sumOf { it.amount } }
         val maxEntry = expenseByDate.maxByOrNull { it.value }
-        
+
+        val photoByDate = txs.filter { !it.imageUrl.isNullOrBlank() }
+            .sortedByDescending { it.date }
+            .groupBy { DateUtils.toLocalDate(it.date) }
+            .mapValues { (_, list) -> list.first().imageUrl!! }
+
         val daysInMonth = mutableListOf<LocalDate>()
         for (i in 1..m.lengthOfMonth()) {
             daysInMonth.add(m.atDay(i))
@@ -114,6 +120,7 @@ class HomeViewModel(
             items = groupByDay(txs, cats.associate { it.id to it.icon }, today()),
             daysInMonth = daysInMonth,
             expenseByDate = expenseByDate,
+            photoByDate = photoByDate,
             maxExpenseDate = maxEntry?.key,
             maxExpenseAmount = maxEntry?.value ?: 0L,
             averageExpensePerDay = avg,

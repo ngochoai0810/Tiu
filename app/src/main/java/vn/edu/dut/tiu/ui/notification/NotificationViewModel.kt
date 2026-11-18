@@ -5,11 +5,16 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import vn.edu.dut.tiu.data.model.Notification
+import vn.edu.dut.tiu.data.repository.NotificationRepository
 
-class NotificationViewModel : ViewModel() {
+class NotificationViewModel(
+    private val notificationRepository: NotificationRepository
+) : ViewModel() {
 
     private val _notifications = MutableStateFlow<List<Notification>>(emptyList())
     private val _filterTab = MutableStateFlow(0) // 0: All, 1: Budget, 2: Reminder
@@ -25,13 +30,13 @@ class NotificationViewModel : ViewModel() {
     }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), NotificationUiState())
 
     init {
-        // Mock data cho giao diện, sẽ thay bằng dữ liệu từ Repository sau
-        val mockData = listOf(
-            Notification("1", "Ăn uống sắp chạm ngân sách", "Đã dùng 90% (540.000 / 600.000đ). Còn 17 ngày trong tháng.", "BUDGET", System.currentTimeMillis() - 3600000, false),
-            Notification("2", "Hôm nay bạn chưa chụp khoản nào", "Ghi lại một tấm trước khi quên nhé.", "REMINDER", System.currentTimeMillis() - 7200000, false),
-            Notification("3", "Minh muốn kết bạn trên tiu", "Hai bạn có thể xem nhật ký được chia sẻ.", "FRIEND", System.currentTimeMillis() - 86400000, true)
-        )
-        _notifications.value = mockData
+        viewModelScope.launch {
+            notificationRepository.observeNotifications()
+                .catch { e -> e.printStackTrace() }
+                .collect { list ->
+                    _notifications.value = list
+                }
+        }
     }
 
     fun setFilterTab(index: Int) {
@@ -39,8 +44,13 @@ class NotificationViewModel : ViewModel() {
     }
 
     fun markAllAsRead() {
-        val current = _notifications.value.map { it.copy(isRead = true) }
-        _notifications.value = current
+        viewModelScope.launch {
+            try {
+                notificationRepository.markAllAsRead()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
+        }
     }
 }
 
