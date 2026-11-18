@@ -36,6 +36,12 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
         execute { repo.register(name.trim(), email.trim(), password) }
     }
 
+    fun sendPasswordReset(email: String) {
+        val error = validateEmail(email)
+        if (error != null) return _state.update { it.copy(error = error) }
+        execute { repo.sendPasswordReset(email.trim()) }
+    }
+
     fun consumeSuccess() = _state.update { it.copy(success = false) }
 
     private fun execute(block: suspend () -> Unit) {

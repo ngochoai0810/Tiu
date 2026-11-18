@@ -82,9 +82,13 @@ class FirestoreTransactionRepository(
 
     override fun observeMonth(month: YearMonth): Flow<List<Transaction>> {
         val (start, end) = DateUtils.monthRange(month)
+        return observeRange(start, end)
+    }
+    
+    override fun observeRange(startMillis: Long, endMillis: Long): Flow<List<Transaction>> {
         return col
-            .whereGreaterThanOrEqualTo("date", Timestamp(Date(start)))
-            .whereLessThan("date", Timestamp(Date(end)))
+            .whereGreaterThanOrEqualTo("date", Timestamp(Date(startMillis)))
+            .whereLessThan("date", Timestamp(Date(endMillis)))
             .orderBy("date", Query.Direction.DESCENDING)
             .snapshotFlow()
             .map { snap -> snap.documents.mapNotNull(FirestoreMapper::toTransaction) }

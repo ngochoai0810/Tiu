@@ -1,0 +1,374 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tiu_paper">
+
+    <!-- Top bar với nút quay lại -->
+    <LinearLayout
+        android:id="@+id/headerBar"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
+        android:paddingTop="12dp"
+        android:paddingBottom="8dp"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnBack"
+            style="@style/Widget.Tiu.CircleButton"
+            android:contentDescription="Quay lại"
+            android:src="@drawable/ic_chevron_left" />
+
+        <View
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_weight="1" />
+
+        <ImageView
+            android:id="@+id/btnSettings"
+            style="@style/Widget.Tiu.CircleButton"
+            android:contentDescription="Cài đặt thông báo"
+            android:src="@drawable/ic_bell" />
+    </LinearLayout>
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/headerBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="HỘP THƯ"
+                android:textAppearance="@style/TextAppearance.Tiu.Eyebrow" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Thông báo"
+                android:textAppearance="@style/TextAppearance.Tiu.Display" />
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/textUnreadCount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="3 chưa đọc"
+                    android:textAppearance="@style/TextAppearance.Tiu.BodySmall"
+                    android:textColor="@color/tiu_text_secondary" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text=" · "
+                    android:textColor="@color/tiu_text_secondary" />
+
+                <TextView
+                    android:id="@+id/btnMarkAllRead"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:clickable="true"
+                    android:focusable="true"
+                    android:text="Đánh dấu đã đọc tất cả"
+                    android:textAppearance="@style/TextAppearance.Tiu.BodySmall"
+                    android:textColor="@color/tiu_orange"
+                    android:textStyle="bold" />
+            </LinearLayout>
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="8dp"
+                android:background="@color/tiu_orange" />
+
+            <!-- Filter tabs -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:layout_marginTop="18dp"
+                android:background="@drawable/bg_doodle_input"
+                android:orientation="horizontal"
+                android:padding="3dp">
+
+                <TextView
+                    android:id="@+id/tabAll"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_toggle_selected"
+                    android:gravity="center"
+                    android:text="Tất cả · 3"
+                    android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+                <TextView
+                    android:id="@+id/tabBudget"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Ngân sách"
+                    android:textAppearance="@style/TextAppearance.Tiu.Label"
+                    android:textColor="@color/tiu_text_secondary" />
+
+                <TextView
+                    android:id="@+id/tabReminder"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Nhắc nhở"
+                    android:textAppearance="@style/TextAppearance.Tiu.Label"
+                    android:textColor="@color/tiu_text_secondary" />
+            </LinearLayout>
+
+            <!-- Nhóm: HÔM NAY -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="8dp"
+                android:text="HÔM NAY"
+                android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                android:textColor="@color/tiu_text_secondary" />
+
+            <!-- Card 1: Ngân sách -->
+            <LinearLayout
+                style="@style/Widget.Tiu.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/bg_doodle_card_warning"
+                    android:gravity="center"
+                    android:text="⚠️"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Ăn uống sắp chạm ngân sách"
+                        android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Đã dùng 90% (540.000 / 600.000đ). Còn 17 ngày trong tháng."
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="09:41"
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption"
+                        android:textColor="@color/tiu_text_secondary" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_badge_notification" />
+            </LinearLayout>
+
+            <!-- Card 2: Nhắc nhở chụp ảnh -->
+            <LinearLayout
+                style="@style/Widget.Tiu.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/bg_doodle_card_orange"
+                    android:gravity="center"
+                    android:text="📷"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hôm nay bạn chưa chụp khoản nào"
+                        android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Ghi lại một tấm trước khi quên nhé."
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="21:00"
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption"
+                        android:textColor="@color/tiu_text_secondary" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_badge_notification" />
+            </LinearLayout>
+
+            <!-- Card 3: Tổng kết tuần -->
+            <LinearLayout
+                style="@style/Widget.Tiu.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="12dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/bg_doodle_card"
+                    android:gravity="center"
+                    android:text="📊"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_marginEnd="8dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Tổng kết tuần đã sẵn sàng"
+                        android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Tuần này bạn chi ít hơn 12% so với tuần trước."
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="20:00"
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption"
+                        android:textColor="@color/tiu_text_secondary" />
+                </LinearLayout>
+
+                <View
+                    android:layout_width="8dp"
+                    android:layout_height="8dp"
+                    android:background="@drawable/bg_badge_notification" />
+            </LinearLayout>
+
+            <!-- Nhóm: TRƯỚC ĐÓ -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="8dp"
+                android:text="TRƯỚC ĐÓ"
+                android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                android:textColor="@color/tiu_text_secondary" />
+
+            <!-- Card 4: Bạn bè -->
+            <LinearLayout
+                style="@style/Widget.Tiu.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:gravity="center_vertical"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:layout_width="38dp"
+                    android:layout_height="38dp"
+                    android:background="@drawable/bg_doodle_card"
+                    android:gravity="center"
+                    android:text="👥"
+                    android:textSize="18sp" />
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="12dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Minh muốn kết bạn trên tiu"
+                        android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="2dp"
+                        android:text="Hai bạn có thể xem nhật ký được chia sẻ. Xem trong Hồ sơ > Bạn bè."
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption" />
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="Hôm qua"
+                        android:textAppearance="@style/TextAppearance.Tiu.Caption"
+                        android:textColor="@color/tiu_text_secondary" />
+                </LinearLayout>
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

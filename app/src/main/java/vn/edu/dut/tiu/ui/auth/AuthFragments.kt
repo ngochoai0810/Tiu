@@ -9,6 +9,7 @@ import androidx.lifecycle.viewmodel.viewModelFactory
 import androidx.navigation.fragment.findNavController
 import androidx.navigation.navOptions
 import vn.edu.dut.tiu.R
+import vn.edu.dut.tiu.databinding.FragmentForgotPasswordBinding
 import vn.edu.dut.tiu.databinding.FragmentLoginBinding
 import vn.edu.dut.tiu.databinding.FragmentRegisterBinding
 import vn.edu.dut.tiu.ui.common.appContainer
@@ -36,6 +37,7 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             vm.signIn(b.inputEmail.text.toString(), b.inputPassword.text.toString())
         }
         b.linkRegister.setOnClickListener { findNavController().navigate(R.id.registerFragment) }
+        b.linkForgotPassword.setOnClickListener { findNavController().navigate(R.id.forgotPasswordFragment) }
 
         collectOnStarted(vm.state) { s ->
             b.progress.visibility = if (s.loading) View.VISIBLE else View.GONE
@@ -44,6 +46,29 @@ class LoginFragment : Fragment(R.layout.fragment_login) {
             if (s.success) {
                 vm.consumeSuccess()
                 goHome()
+            }
+        }
+    }
+}
+
+class ForgotPasswordFragment : Fragment(R.layout.fragment_forgot_password) {
+    private val vm: AuthViewModel by viewModels { authViewModelFactory() }
+
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        val b = FragmentForgotPasswordBinding.bind(view)
+        b.btnSendReset.setOnClickListener {
+            vm.sendPasswordReset(b.inputEmail.text.toString())
+        }
+        b.linkBackToLogin.setOnClickListener { findNavController().popBackStack() }
+        b.btnDone.setOnClickListener { findNavController().popBackStack() }
+
+        collectOnStarted(vm.state) { s ->
+            b.progress.visibility = if (s.loading) View.VISIBLE else View.GONE
+            b.btnSendReset.isEnabled = !s.loading
+            b.textError.showError(s.error)
+            if (s.success) {
+                b.layoutInput.visibility = View.GONE
+                b.layoutSuccess.visibility = View.VISIBLE
             }
         }
     }

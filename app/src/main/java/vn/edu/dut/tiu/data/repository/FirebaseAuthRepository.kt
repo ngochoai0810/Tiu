@@ -33,6 +33,10 @@ class FirebaseAuthRepository(
         ensureUserDocument(user.uid, displayName, email)
     }
 
+    override suspend fun sendPasswordReset(email: String) {
+        auth.sendPasswordResetEmail(email.trim()).await()
+    }
+
     override suspend fun currentProfile(): UserProfile? {
         val uid = currentUserId ?: return null
         val doc = db.collection(FirestorePaths.USERS).document(uid).get().await()

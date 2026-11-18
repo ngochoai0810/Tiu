@@ -1,0 +1,225 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/tiu_paper">
+
+    <include
+        android:id="@+id/topBar"
+        layout="@layout/layout_top_bar"
+        app:layout_constraintTop_toTopOf="parent" />
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:clipToPadding="false"
+        android:paddingBottom="80dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/topBar">
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingHorizontal="20dp"
+            android:paddingBottom="24dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="PHÂN TÍCH"
+                android:textAppearance="@style/TextAppearance.Tiu.Eyebrow" />
+
+            <TextView
+                android:id="@+id/textTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Chi tiêu tháng này"
+                android:textAppearance="@style/TextAppearance.Tiu.Display" />
+
+            <TextView
+                android:id="@+id/textSubtitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:text="Tổng hợp cơ cấu chi tiêu của bạn"
+                android:textAppearance="@style/TextAppearance.Tiu.BodySmall"
+                android:textColor="@color/tiu_text_secondary" />
+
+            <View
+                android:layout_width="48dp"
+                android:layout_height="3dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="16dp"
+                android:background="@color/tiu_orange" />
+
+            <!-- Bộ lọc thời gian: Tuần | Tháng | Năm -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="48dp"
+                android:background="@drawable/bg_doodle_input"
+                android:orientation="horizontal"
+                android:padding="3dp">
+
+                <TextView
+                    android:id="@+id/tabWeek"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Tuần"
+                    android:textAppearance="@style/TextAppearance.Tiu.Label"
+                    android:textColor="@color/tiu_text_secondary" />
+
+                <TextView
+                    android:id="@+id/tabMonth"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_toggle_selected"
+                    android:gravity="center"
+                    android:text="Tháng"
+                    android:textAppearance="@style/TextAppearance.Tiu.Label"
+                    android:textColor="@color/tiu_ink" />
+
+                <TextView
+                    android:id="@+id/tabYear"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_weight="1"
+                    android:gravity="center"
+                    android:text="Năm"
+                    android:textAppearance="@style/TextAppearance.Tiu.Label"
+                    android:textColor="@color/tiu_text_secondary" />
+            </LinearLayout>
+
+            <!-- Card Biểu đồ Donut + Legend -->
+            <LinearLayout
+                style="@style/Widget.Tiu.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:gravity="center_vertical"
+                android:orientation="horizontal"
+                android:padding="16dp">
+
+                <vn.edu.dut.tiu.ui.stats.DonutChartView
+                    android:id="@+id/donutChart"
+                    android:layout_width="145dp"
+                    android:layout_height="145dp" />
+
+                <LinearLayout
+                    android:id="@+id/layoutLegend"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="14dp"
+                    android:layout_weight="1"
+                    android:orientation="vertical">
+
+                    <!-- Các dòng danh mục sẽ được thêm code-dynamically -->
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- 2 thẻ tóm tắt: Thu nhập & Chi tiêu -->
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:orientation="horizontal">
+
+                <LinearLayout
+                    style="@style/Widget.Tiu.Card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_doodle_card"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="THU NHẬP"
+                        android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                        android:textColor="@color/tiu_income" />
+
+                    <TextView
+                        android:id="@+id/tvTotalIncome"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="+0 ₫"
+                        android:textAppearance="@style/TextAppearance.Tiu.H3"
+                        android:textColor="@color/tiu_ink" />
+                </LinearLayout>
+
+                <LinearLayout
+                    style="@style/Widget.Tiu.Card"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="6dp"
+                    android:layout_weight="1"
+                    android:background="@drawable/bg_doodle_card_warning"
+                    android:orientation="vertical"
+                    android:padding="14dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="CHI TIÊU"
+                        android:textAppearance="@style/TextAppearance.Tiu.Eyebrow"
+                        android:textColor="@color/tiu_expense" />
+
+                    <TextView
+                        android:id="@+id/tvTotalExpense"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:text="-0 ₫"
+                        android:textAppearance="@style/TextAppearance.Tiu.H3"
+                        android:textColor="@color/tiu_ink" />
+                </LinearLayout>
+            </LinearLayout>
+
+            <!-- Thẻ Gợi ý thông minh (Nét đứt) -->
+            <LinearLayout
+                style="@style/Widget.Tiu.Card"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="16dp"
+                android:background="@drawable/bg_dashed"
+                android:orientation="vertical"
+                android:padding="16dp">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="GỢI Ý THÔNG MINH"
+                    android:textAppearance="@style/TextAppearance.Tiu.Eyebrow" />
+
+                <TextView
+                    android:id="@+id/tvSmartInsightTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Bạn đang kiểm soát chi tiêu rất tốt!"
+                    android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+                <TextView
+                    android:id="@+id/tvSmartInsightBody"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="Chi tiêu ăn uống và sinh hoạt tháng này đang nằm trong hạn mức kế hoạch."
+                    android:textAppearance="@style/TextAppearance.Tiu.Caption" />
+            </LinearLayout>
+
+        </LinearLayout>
+    </ScrollView>
+
+</androidx.constraintlayout.widget.ConstraintLayout>

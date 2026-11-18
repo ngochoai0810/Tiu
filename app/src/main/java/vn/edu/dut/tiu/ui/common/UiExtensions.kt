@@ -80,6 +80,7 @@ fun LayoutTopBarBinding.setup(fragment: Fragment) {
     avatar.text = initials(fragment.appContainer.authRepository.currentDisplayName)
     btnAdd.setOnClickListener { fragment.findNavController().navigate(R.id.transactionEditorFragment) }
     avatar.setOnClickListener { fragment.findNavController().navigate(R.id.accountFragment) }
+    btnNotification.setOnClickListener { fragment.findNavController().navigate(R.id.notificationFragment) }
 }
 
 /** Tự chèn dấu chấm phân cách hàng nghìn khi gõ số tiền: 85000 -> 85.000 */

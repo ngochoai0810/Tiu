@@ -1,8 +1,12 @@
 package vn.edu.dut.tiu.ui
 
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import android.view.View
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.view.ViewCompat
 import androidx.core.view.WindowInsetsCompat
 import androidx.navigation.NavController
@@ -11,6 +15,9 @@ import androidx.navigation.ui.setupWithNavController
 import vn.edu.dut.tiu.R
 import vn.edu.dut.tiu.TiuApp
 import vn.edu.dut.tiu.databinding.ActivityMainBinding
+import vn.edu.dut.tiu.worker.DailyReminderWorker
+import java.util.Calendar
+import java.util.concurrent.TimeUnit
 
 /** Single-Activity: mọi màn hình là Fragment trong nav_graph. */
 class MainActivity : AppCompatActivity() {
@@ -47,6 +54,46 @@ class MainActivity : AppCompatActivity() {
         navController.addOnDestinationChangedListener { _, destination, _ ->
             binding.bottomNav.visibility =
                 if (destination.id in bottomNavDestinations) View.VISIBLE else View.GONE
+        }
+
+        checkNotificationPermissionAndSchedule()
+        handleIntent(intent)
+    }
+
+    override fun onNewIntent(intent: android.content.Intent?) {
+        super.onNewIntent(intent)
+        handleIntent(intent)
+    }
+
+    private fun handleIntent(intent: android.content.Intent?) {
+        val openFromNotification = intent?.getBooleanExtra("OPEN_FROM_NOTIFICATION", false) ?: false
+        if (openFromNotification) {
+            // Mở thẳng màn hình nhập liệu nếu bấm từ notification
+            // TODO: Thiết lập DeepLink hoặc điều hướng trực tiếp
+        }
+    }
+
+    private val requestPermissionLauncher = registerForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { isGranted: Boolean ->
+        if (isGranted) {
+            vn.edu.dut.tiu.worker.ReminderManager.scheduleReminder(this)
+        }
+    }
+
+    private fun checkNotificationPermissionAndSchedule() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            if (ContextCompat.checkSelfPermission(
+                    this,
+                    android.Manifest.permission.POST_NOTIFICATIONS
+                ) == PackageManager.PERMISSION_GRANTED
+            ) {
+                vn.edu.dut.tiu.worker.ReminderManager.scheduleReminder(this)
+            } else {
+                requestPermissionLauncher.launch(android.Manifest.permission.POST_NOTIFICATIONS)
+            }
+        } else {
+            vn.edu.dut.tiu.worker.ReminderManager.scheduleReminder(this)
         }
     }
 }

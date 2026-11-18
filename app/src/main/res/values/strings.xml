@@ -66,6 +66,10 @@
 
     <string name="account_eyebrow">Hồ sơ</string>
     <string name="account_manage_categories">Quản lý danh mục</string>
+    <string name="account_settings_reminder">Nhắc nhở hàng ngày</string>
+    <string name="account_settings_reminder_time">Thời gian nhắc nhở</string>
+    <string name="account_settings_reminder_text">Nội dung nhắc nhở</string>
+    <string name="account_settings_reminder_text_hint">VD: Ghi lại chi tiêu hôm nay nhé</string>
     <string name="account_logout">Đăng xuất</string>
 
     <string name="placeholder_stats_title">Thống kê</string>

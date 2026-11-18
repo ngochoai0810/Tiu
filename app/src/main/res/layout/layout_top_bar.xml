@@ -1,7 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Thanh trên cùng theo Figma: nút +, logo "tiu", avatar chữ cái -->
+<!-- Thanh trên cùng theo Figma: nút +, logo "TIU tiu", chuông thông báo có badge, avatar chữ cái -->
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
     android:paddingHorizontal="20dp"
@@ -16,23 +17,66 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-    <TextView
+    <LinearLayout
         android:id="@+id/logo"
         android:layout_width="wrap_content"
         android:layout_height="44dp"
         android:background="@drawable/bg_doodle_input"
         android:gravity="center"
-        android:paddingStart="22dp"
-        android:paddingEnd="25dp"
+        android:orientation="horizontal"
+        android:paddingHorizontal="20dp"
         android:paddingBottom="3dp"
-        android:text="@string/app_name"
-        android:textColor="@color/tiu_ink"
-        android:textSize="17sp"
-        android:textStyle="bold"
         app:layout_constraintBottom_toBottomOf="@id/btnAdd"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="@id/btnAdd" />
+        app:layout_constraintTop_toTopOf="@id/btnAdd">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="TIU "
+            android:textColor="@color/tiu_orange"
+            android:textSize="15sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="tiu"
+            android:textColor="@color/tiu_ink"
+            android:textSize="17sp"
+            android:textStyle="bold" />
+    </LinearLayout>
+
+    <FrameLayout
+        android:id="@+id/btnNotificationContainer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginEnd="12dp"
+        app:layout_constraintEnd_toStartOf="@id/avatar"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <ImageView
+            android:id="@+id/btnNotification"
+            style="@style/Widget.Tiu.CircleButton"
+            android:contentDescription="Thông báo"
+            android:src="@drawable/ic_bell" />
+
+        <TextView
+            android:id="@+id/badgeNotification"
+            android:layout_width="18dp"
+            android:layout_height="18dp"
+            android:layout_gravity="top|end"
+            android:background="@drawable/bg_badge_notification"
+            android:gravity="center"
+            android:text="3"
+            android:textColor="@color/white"
+            android:textSize="10sp"
+            android:textStyle="bold"
+            tools:visibility="visible" />
+    </FrameLayout>
+
+    <!-- Đã di chuyển btnSearch sang fragment_home.xml -->
 
     <TextView
         android:id="@+id/avatar"
@@ -47,7 +91,6 @@
         android:textStyle="bold"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        tools:text="AN"
-        xmlns:tools="http://schemas.android.com/tools" />
+        tools:text="AN" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>

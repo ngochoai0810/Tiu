@@ -7,8 +7,14 @@ class TiuApp : Application() {
     lateinit var container: AppContainer
         private set
 
+    companion object {
+        lateinit var instance: TiuApp
+            private set
+    }
+    
     override fun onCreate() {
         super.onCreate()
+        instance = this
         container = AppContainer()
     }
 }

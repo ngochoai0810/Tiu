@@ -156,9 +156,21 @@ private class BudgetAdapter(
         holder.b.progress.setIndicatorColor(
             ContextCompat.getColor(ctx, if (p.status == BudgetProgress.Status.OK) R.color.tiu_orange else R.color.tiu_expense)
         )
-        holder.b.textDetail.text = buildString {
-            append("${p.percent}% · hạn mức ${MoneyFormat.format(p.limit)}")
-            if (p.status == BudgetProgress.Status.OVER) append(" · vượt ${MoneyFormat.format(-p.remaining)}")
+        holder.b.textPercent.text = "${p.percent}%"
+        if (p.status == BudgetProgress.Status.OVER) {
+            holder.b.badgeWarning.visibility = View.VISIBLE
+            holder.b.badgeWarning.text = "Vượt mức"
+            holder.b.textLimit.visibility = View.VISIBLE
+            holder.b.textLimit.text = " / ${MoneyFormat.format(p.limit)}"
+        } else if (p.status == BudgetProgress.Status.WARNING) {
+            holder.b.badgeWarning.visibility = View.VISIBLE
+            holder.b.badgeWarning.text = "Sắp vượt"
+            holder.b.textLimit.visibility = View.VISIBLE
+            holder.b.textLimit.text = " / ${MoneyFormat.format(p.limit)}"
+        } else {
+            holder.b.badgeWarning.visibility = View.GONE
+            holder.b.textLimit.visibility = View.VISIBLE
+            holder.b.textLimit.text = " / ${MoneyFormat.format(p.limit)}"
         }
         holder.b.root.setOnClickListener { onClick(item) }
     }

@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    style="@style/Widget.Tiu.Card"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="24dp"
+    android:gravity="center_horizontal"
+    android:orientation="vertical"
+    android:padding="24dp">
+
+    <!-- Icon Thùng rác đỏ tròn doodle -->
+    <TextView
+        android:layout_width="56dp"
+        android:layout_height="56dp"
+        android:background="@drawable/bg_doodle_card_warning"
+        android:gravity="center"
+        android:text="🗑️"
+        android:textSize="24sp" />
+
+    <TextView
+        android:id="@+id/dialogTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="16dp"
+        android:text="Xóa giao dịch này?"
+        android:textAppearance="@style/TextAppearance.Tiu.H3" />
+
+    <TextView
+        android:id="@+id/dialogMessage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:gravity="center"
+        android:text="Khoản chi và ảnh đính kèm sẽ bị xóa vĩnh viễn khỏi nhật ký."
+        android:textAppearance="@style/TextAppearance.Tiu.BodySmall"
+        android:textColor="@color/tiu_text_secondary" />
+
+    <!-- 2 nút Giữ lại & Xóa -->
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="24dp"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/btnCancel"
+            style="@style/Widget.Tiu.Button.Ghost"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginEnd="8dp"
+            android:layout_weight="1"
+            android:gravity="center"
+            android:text="Giữ lại"
+            android:textAppearance="@style/TextAppearance.Tiu.Label" />
+
+        <TextView
+            android:id="@+id/btnConfirmDelete"
+            style="@style/Widget.Tiu.Button"
+            android:layout_width="0dp"
+            android:layout_height="48dp"
+            android:layout_marginStart="8dp"
+            android:layout_weight="1"
+            android:background="@drawable/bg_doodle_card_warning"
+            android:gravity="center"
+            android:text="Xóa"
+            android:textAppearance="@style/TextAppearance.Tiu.Label"
+            android:textColor="@color/tiu_expense" />
+    </LinearLayout>
+
+</LinearLayout>

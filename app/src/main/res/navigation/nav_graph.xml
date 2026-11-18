@@ -16,9 +16,18 @@
         android:label="Đăng ký" />
 
     <fragment
+        android:id="@+id/forgotPasswordFragment"
+        android:name="vn.edu.dut.tiu.ui.auth.ForgotPasswordFragment"
+        android:label="Quên mật khẩu" />
+
+    <fragment
         android:id="@+id/homeFragment"
         android:name="vn.edu.dut.tiu.ui.home.HomeFragment"
         android:label="@string/nav_home" />
+
+    <fragment
+        android:id="@+id/searchFragment"
+        android:name="vn.edu.dut.tiu.ui.home.SearchFragment" />
 
     <fragment
         android:id="@+id/transactionEditorFragment"
@@ -33,19 +42,13 @@
 
     <fragment
         android:id="@+id/statsFragment"
-        android:name="vn.edu.dut.tiu.ui.common.PlaceholderFragment"
-        android:label="@string/nav_stats">
-        <argument android:name="title" android:defaultValue="@string/placeholder_stats_title" app:argType="reference" />
-        <argument android:name="body" android:defaultValue="@string/placeholder_stats_body" app:argType="reference" />
-    </fragment>
+        android:name="vn.edu.dut.tiu.ui.stats.StatsFragment"
+        android:label="@string/nav_stats" />
 
     <fragment
         android:id="@+id/cameraFragment"
-        android:name="vn.edu.dut.tiu.ui.common.PlaceholderFragment"
-        android:label="@string/nav_camera">
-        <argument android:name="title" android:defaultValue="@string/placeholder_camera_title" app:argType="reference" />
-        <argument android:name="body" android:defaultValue="@string/placeholder_camera_body" app:argType="reference" />
-    </fragment>
+        android:name="vn.edu.dut.tiu.ui.camera.CameraFragment"
+        android:label="@string/nav_camera" />
 
     <fragment
         android:id="@+id/budgetFragment"
@@ -61,5 +64,15 @@
         android:id="@+id/categoryFragment"
         android:name="vn.edu.dut.tiu.ui.category.CategoryFragment"
         android:label="Danh mục" />
+
+    <fragment
+        android:id="@+id/notificationFragment"
+        android:name="vn.edu.dut.tiu.ui.notification.NotificationFragment"
+        android:label="Thông báo" />
+
+    <fragment
+        android:id="@+id/notificationSettingsFragment"
+        android:name="vn.edu.dut.tiu.ui.notification.NotificationSettingsFragment"
+        android:label="Cài đặt thông báo" />
 
 </navigation>
