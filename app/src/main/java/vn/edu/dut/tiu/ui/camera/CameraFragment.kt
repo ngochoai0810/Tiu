@@ -6,7 +6,6 @@ import android.net.Uri
 import android.content.ContentUris
 import android.content.Context
 import android.os.Build
-import android.os.SystemClock
 import android.provider.MediaStore
 import android.os.Bundle
 import android.util.Log
@@ -14,8 +13,6 @@ import android.view.View
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.camera.core.Camera
-import androidx.camera.core.ImageAnalysis
-import androidx.camera.core.ImageProxy
 import androidx.camera.core.TorchState
 import androidx.camera.core.CameraSelector
 import androidx.camera.core.ImageCapture
@@ -26,10 +23,6 @@ import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.lifecycleScope
-import com.google.mlkit.vision.common.InputImage
-import com.google.mlkit.vision.text.TextRecognition
-import com.google.mlkit.vision.text.TextRecognizer
-import com.google.mlkit.vision.text.latin.TextRecognizerOptions
 import com.bumptech.glide.Glide
 import com.bumptech.glide.load.resource.bitmap.CenterCrop
 import com.bumptech.glide.load.resource.bitmap.RoundedCorners
@@ -52,13 +45,10 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     private var _binding: FragmentCameraBinding? = null
     private val binding get() = _binding!!
 
-    private var isOcrMode = true
+    private var isOcrMode = false
     private var isFlashOn = false
     private var camera: Camera? = null
     private var cameraSession = 0
-    private var liveRecognizer: TextRecognizer? = null
-    private var lastAnalysisAt = 0L
-    private var ocrReadyAt = Long.MAX_VALUE
     private var instructionJob: Job? = null
     private var galleryJob: Job? = null
     private var galleryPermissionPending = false
@@ -101,7 +91,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         _binding = FragmentCameraBinding.bind(view)
         val b = binding
-        liveRecognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
         b.topBar.setup(this)
         b.topBar.logo.visibility = View.GONE
         b.tvInstructionTitle.visibility = View.GONE
@@ -110,16 +99,13 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             if (state == PreviewView.StreamState.STREAMING) showFirstUseInstructions()
         }
 
-        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_GRANTED) {
-            startCamera()
-        } else {
+        if (ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) != PackageManager.PERMISSION_GRANTED) {
             requestPermissionLauncher.launch(Manifest.permission.CAMERA)
         }
 
         // Toggle OCR / Ảnh
         b.tabOcr.setOnClickListener {
             isOcrMode = true
-            ocrReadyAt = SystemClock.elapsedRealtime() + 3_000
             b.tabOcr.setBackgroundResource(R.drawable.bg_camera_mode_selected)
             b.tabPhoto.setBackgroundResource(0)
             b.tabOcr.setTextColor(ContextCompat.getColor(requireContext(), R.color.tiu_ink))
@@ -134,7 +120,6 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
         b.tabPhoto.setOnClickListener {
             isOcrMode = false
-            ocrReadyAt = Long.MAX_VALUE
             b.tabPhoto.setBackgroundResource(R.drawable.bg_camera_mode_selected)
             b.tabOcr.setBackgroundResource(0)
             b.tabPhoto.setTextColor(ContextCompat.getColor(requireContext(), R.color.tiu_ink))
@@ -212,11 +197,15 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     override fun onResume() {
         super.onResume()
+        if (camera == null && ContextCompat.checkSelfPermission(requireContext(), Manifest.permission.CAMERA) ==
+            PackageManager.PERMISSION_GRANTED) startCamera()
         refreshGalleryThumbnail()
         showFirstUseInstructions()
     }
 
     override fun onPause() {
+        stopCamera()
+        galleryJob?.cancel()
         instructionJob?.cancel()
         instructionJob = null
         _binding?.badgeScanning?.visibility = View.GONE
@@ -323,6 +312,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
 
     private fun startCamera() {
         val b = _binding ?: return
+        if (!isResumed) return
         val owner = viewLifecycleOwner
         val session = ++cameraSession
         camera = null
@@ -333,7 +323,7 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         val executor = ContextCompat.getMainExecutor(b.root.context)
         val cameraProviderFuture = ProcessCameraProvider.getInstance(b.root.context)
         cameraProviderFuture.addListener({
-            if (_binding !== b || session != cameraSession) return@addListener
+            if (_binding !== b || session != cameraSession || !isResumed) return@addListener
             try {
                 val provider = cameraProviderFuture.get()
                 cameraProvider = provider
@@ -342,12 +332,8 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
                     it.surfaceProvider = b.viewFinder.surfaceProvider
                 }
                 val capture = ImageCapture.Builder().build()
-                val analysis = ImageAnalysis.Builder()
-                    .setBackpressureStrategy(ImageAnalysis.STRATEGY_KEEP_ONLY_LATEST)
-                    .build()
-                analysis.setAnalyzer(executor) { frame -> analyzeReceiptFrame(frame, b, session) }
                 val selector = CameraSelector.Builder().requireLensFacing(lensFacing).build()
-                val activeCamera = provider.bindToLifecycle(owner, selector, preview, capture, analysis)
+                val activeCamera = provider.bindToLifecycle(owner, selector, preview, capture)
                 camera = activeCamera
                 imageCapture = capture
                 requestGalleryAccessOnce()
@@ -378,50 +364,13 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         }, executor)
     }
 
-    @androidx.annotation.OptIn(markerClass = [androidx.camera.core.ExperimentalGetImage::class])
-    private fun analyzeReceiptFrame(frame: ImageProxy, b: FragmentCameraBinding, session: Int) {
-        val recognizer = liveRecognizer
-        val now = SystemClock.elapsedRealtime()
-        if (_binding !== b || session != cameraSession || !isResumed || !isOcrMode ||
-            recognizer == null || now < ocrReadyAt || now - lastAnalysisAt < 1_000) {
-            frame.close()
-            return
-        }
-        val mediaImage = frame.image
-        if (mediaImage == null) {
-            frame.close()
-            return
-        }
-        lastAnalysisAt = now
-        b.badgeScanning.visibility = View.VISIBLE
-        val executor = ContextCompat.getMainExecutor(b.root.context)
-        try {
-            val image = InputImage.fromMediaImage(mediaImage, frame.imageInfo.rotationDegrees)
-            recognizer.process(image)
-                .addOnSuccessListener(executor) { result ->
-                    if (_binding !== b || session != cameraSession || !isOcrMode ||
-                        SystemClock.elapsedRealtime() < ocrReadyAt) return@addOnSuccessListener
-                    val color = if (result.text.isNotBlank()) R.color.tiu_orange else R.color.white
-                    b.viewOcrFrame.backgroundTintList = android.content.res.ColorStateList.valueOf(
-                        ContextCompat.getColor(b.root.context, color)
-                    )
-                }
-                .addOnFailureListener(executor) { error ->
-                    Log.w("CameraFragment", "Không đọc được khung hình OCR", error)
-                }
-                .addOnCompleteListener(executor) {
-                    if (_binding === b && session == cameraSession) b.badgeScanning.visibility = View.GONE
-                    frame.close()
-                }
-        } catch (e: Exception) {
-            if (_binding === b && session == cameraSession) b.badgeScanning.visibility = View.GONE
-            frame.close()
-            Log.w("CameraFragment", "Không thể quét khung hình", e)
-        }
-    }
-
     private fun takePhoto() {
         val imageCapture = imageCapture ?: return
+        val b = _binding ?: return
+        if (!isResumed || !b.btnShutter.isEnabled) return
+        val session = cameraSession
+        val captureOcrMode = isOcrMode
+        b.btnShutter.isEnabled = false
         
         // Tạo file tạm để lưu ảnh
         val outputDirectory = File(requireContext().cacheDir, "camera_images").apply { mkdirs() }
@@ -437,16 +386,20 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
             object : ImageCapture.OnImageSavedCallback {
                 override fun onError(exc: ImageCaptureException) {
                     Log.e("CameraFragment", "Chụp ảnh thất bại: ${exc.message}", exc)
-                    val b = _binding ?: return
+                    if (_binding !== b || session != cameraSession || !isResumed) return
+                    b.btnShutter.isEnabled = true
                     Toast.makeText(b.root.context, "Lỗi khi chụp ảnh", Toast.LENGTH_SHORT).show()
                 }
 
                 override fun onImageSaved(output: ImageCapture.OutputFileResults) {
-                    if (_binding == null || !isAdded) return
+                    if (_binding !== b || session != cameraSession || !isResumed) {
+                        photoFile.delete()
+                        return
+                    }
                     val savedUri = Uri.fromFile(photoFile)
                     val bundle = Bundle().apply {
                         putString("imageUri", savedUri.toString())
-                        putBoolean("isOcrMode", isOcrMode)
+                        putBoolean("isOcrMode", captureOcrMode)
                     }
                     findNavController().navigate(R.id.transactionEditorFragment, bundle)
                 }
@@ -454,19 +407,24 @@ class CameraFragment : Fragment(R.layout.fragment_camera) {
         )
     }
     
+    private fun stopCamera() {
+        // Invalidate pending provider callbacks before leaving the camera screen.
+        cameraSession++
+        camera?.cameraInfo?.torchState?.removeObservers(viewLifecycleOwner)
+        camera?.cameraInfo?.zoomState?.removeObservers(viewLifecycleOwner)
+        camera?.cameraControl?.enableTorch(false)
+        cameraProvider?.unbindAll()
+        camera = null
+        imageCapture = null
+    }
+
     override fun onDestroyView() {
         instructionJob?.cancel()
         instructionJob = null
         galleryJob?.cancel()
         galleryJob = null
         _binding?.let { Glide.with(it.root).clear(it.btnGallery) }
-        cameraSession++
-        liveRecognizer?.close()
-        liveRecognizer = null
-        camera?.cameraControl?.enableTorch(false)
-        cameraProvider?.unbindAll()
-        camera = null
-        imageCapture = null
+        stopCamera()
         _binding = null
         super.onDestroyView()
     }

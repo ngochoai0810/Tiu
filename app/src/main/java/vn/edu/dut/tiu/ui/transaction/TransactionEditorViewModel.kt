@@ -176,21 +176,18 @@ class TransactionEditorViewModel(
         viewModelScope.launch {
             _state.update { it.copy(isSaving = true) }
             
-            var uploadedImageUrl = s.original?.imageUrl
-            
-            // Xử lý upload ảnh nếu có URI nội bộ (content:// hoặc file://)
-            if (s.imageUri != null && !s.imageUri.startsWith("http")) {
+            val uploadedImageUrl = if (s.imageUri != null && (s.imageUri.startsWith("content://") || s.imageUri.startsWith("file://"))) {
                 _state.update { it.copy(isUploadingImage = true) }
                 try {
-                    uploadedImageUrl = uploadImageToStorage(s.imageUri)
+                    uploadImageToStorage(s.imageUri)
                 } catch (e: Exception) {
                     _events.send(Event.Error("Lỗi tải ảnh lên: ${e.toUserMessage()}"))
                     _state.update { it.copy(isSaving = false, isUploadingImage = false) }
                     return@launch
                 }
-            } else if (s.imageUri == null) {
-                // Người dùng đã xóa ảnh
-                uploadedImageUrl = null
+            } else {
+                // Giữ nguyên ảnh đã có (bắt đầu bằng http hoặc data:image) hoặc null nếu xóa ảnh
+                s.imageUri
             }
 
             val tx = Transaction(
@@ -276,7 +273,7 @@ class TransactionEditorViewModel(
             state.ocrText != null || state.ocrError != null) return
         val appContext = context.applicationContext
         _state.update { it.copy(isRecognizing = true, ocrError = null) }
-        ocrJob = viewModelScope.launch {
+        ocrJob = viewModelScope.launch(Dispatchers.Default) {
             val recognizer = TextRecognition.getClient(TextRecognizerOptions.DEFAULT_OPTIONS)
             try {
                 val image = withContext(Dispatchers.IO) {
