@@ -60,19 +60,22 @@ object ReceiptAmountParser {
             }.flatMap { amounts(it.text) }.distinct()
             if (below.size == 1) candidates += Candidate(below.single(), priority, label.top)
         }
+        // Có dòng "Tổng ..." đọc được số tiền -> tin dòng đó, không lấy số lớn nhất trên hóa đơn
+        // (mã vạch, mã đơn in cuối hóa đơn thường lớn hơn tổng tiền).
         val totalAmounts = candidates.filter { it.score >= 90 }.map { it.amount }
-
+        if (totalAmounts.isNotEmpty()) return totalAmounts.max()
 
         // OCR often separates the total label and amount into distant blocks.
-        // Compare eligible receipt amounts instead of accepting a smaller item row.
+        // Fallback: largest money-looking amount, skipping long bare digit runs (barcodes, order ids).
         val eligibleAmounts = ordered.filter {
             !excluded.containsMatchIn(normalize(it.text))
-        }.flatMap { amounts(it.text) }
-        return (eligibleAmounts + totalAmounts).maxOrNull()
+        }.flatMap { amounts(it.text, allowBareLong = false) }
+        return (eligibleAmounts + candidates.map { it.amount }).maxOrNull()
     }
 
-    private fun amounts(text: String): List<Long> = money.findAll(text).mapNotNull { match ->
+    private fun amounts(text: String, allowBareLong: Boolean = true): List<Long> = money.findAll(text).mapNotNull { match ->
         val raw = match.value.replace(Regex("""[.,]00$"""), "")
+        if (!allowBareLong && raw.length >= 7 && raw.all(Char::isDigit)) return@mapNotNull null
         raw.filter(Char::isDigit).toLongOrNull()?.takeIf { it in 1_000..999_999_999 }
     }.toList()
 

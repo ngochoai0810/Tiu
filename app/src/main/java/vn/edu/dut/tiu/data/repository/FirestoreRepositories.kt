@@ -42,7 +42,7 @@ class FirestoreCategoryRepository(
 
     override suspend fun add(category: Category): String {
         val ref = col.document()
-        ref.set(FirestoreMapper.toMap(category.copy(createdAt = System.currentTimeMillis()))).await()
+        ref.set(FirestoreMapper.toMap(category.copy(createdAt = System.currentTimeMillis()))).awaitOrQueued()
         return ref.id
     }
 
@@ -58,11 +58,11 @@ class FirestoreCategoryRepository(
         related.documents.take(MAX_BATCH - 1).forEach { doc ->
             batch.update(doc.reference, "categoryName", category.name)
         }
-        batch.commit().await()
+        batch.commit().awaitOrQueued()
     }
 
     override suspend fun delete(categoryId: String) {
-        col.document(categoryId).delete().await()
+        col.document(categoryId).delete().awaitOrQueued()
     }
 
     override suspend fun isInUse(categoryId: String): Boolean =
@@ -100,18 +100,18 @@ class FirestoreTransactionRepository(
     override suspend fun add(transaction: Transaction): String {
         val now = System.currentTimeMillis()
         val ref = col.document()
-        ref.set(FirestoreMapper.toMap(transaction.copy(createdAt = now, updatedAt = now))).await()
+        ref.set(FirestoreMapper.toMap(transaction.copy(createdAt = now, updatedAt = now))).awaitOrQueued()
         return ref.id
     }
 
     override suspend fun update(transaction: Transaction) {
         val data = FirestoreMapper.toMap(transaction.copy(updatedAt = System.currentTimeMillis()))
             .minus("createdAt") // không ghi đè thời điểm tạo
-        col.document(transaction.id).update(data).await()
+        col.document(transaction.id).update(data).awaitOrQueued()
     }
 
     override suspend fun delete(id: String) {
-        col.document(id).delete().await()
+        col.document(id).delete().awaitOrQueued()
     }
 }
 
@@ -135,10 +135,21 @@ class FirestoreBudgetRepository(
             createdAt = if (budget.createdAt == 0L) now else budget.createdAt,
             updatedAt = now,
         )
-        col.document(id).set(FirestoreMapper.toMap(toSave)).await()
+        col.document(id).set(FirestoreMapper.toMap(toSave)).awaitOrQueued()
     }
 
     override suspend fun delete(id: String) {
-        col.document(id).delete().await()
+        col.document(id).delete().awaitOrQueued()
     }
+}
+
+/**
+ * Ghi Firestore: chờ máy chủ xác nhận tối đa [WRITE_ACK_TIMEOUT_MS]. Khi mất mạng Firestore đã ghi vào
+ * cache cục bộ và tự đồng bộ lại sau, nên không bắt người dùng chờ mãi (BUG-06, Tuần 5).
+ * Lỗi trả về sớm (vd. PERMISSION_DENIED) vẫn được ném ra như cũ.
+ */
+internal const val WRITE_ACK_TIMEOUT_MS = 3_000L
+
+private suspend fun com.google.android.gms.tasks.Task<Void>.awaitOrQueued() {
+    kotlinx.coroutines.withTimeoutOrNull(WRITE_ACK_TIMEOUT_MS) { await() }
 }

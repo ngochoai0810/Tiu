@@ -107,6 +107,16 @@ class HomeFragment : Fragment(R.layout.fragment_home) {
             val blanks = firstDayOfWeek - 1
             val calendarItems = List(blanks) { null } + s.daysInMonth
             calendarAdapter.submitData(calendarItems, s.expenseByDate, s.photoByDate, s.maxExpenseAmount)
+            // BUG-08 (Tuần 5): trên màn nhỏ wrap_content chỉ đo 2 hàng -> mất ngày 9..31.
+            // Đặt chiều cao = số hàng × cạnh ô vuông (ô 1:1, rộng = 1/7 lưới).
+            val rv = b.recyclerCalendar
+            rv.post {
+                val rows = (calendarItems.size + 6) / 7
+                val cell = (rv.width - rv.paddingStart - rv.paddingEnd) / 7
+                if (cell > 0 && rv.layoutParams.height != rows * cell) {
+                    rv.layoutParams = rv.layoutParams.apply { height = rows * cell }
+                }
+            }
         }
         collectOnStarted(vm.messages) { msg -> Snackbar.make(view, msg, Snackbar.LENGTH_SHORT).show() }
     }
