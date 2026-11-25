@@ -2,11 +2,13 @@ package vn.edu.dut.tiu.ui.auth
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.TimeoutCancellationException
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeout
 import vn.edu.dut.tiu.data.repository.AuthRepository
 import vn.edu.dut.tiu.ui.common.toUserMessage
 
@@ -31,7 +33,6 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
         val error = (if (name.isBlank()) "Nhập tên hiển thị" else null)
             ?: validateEmail(email)
             ?: validatePassword(password)
-            ?: (if (password.length > 8) "Mật khẩu tối đa 8 ký tự" else null)
             ?: (if (confirm.isBlank()) "Vui lòng nhập lại mật khẩu" else if (password != confirm) "Mật khẩu nhập lại không khớp" else null)
         if (error != null) return _state.update { it.copy(error = error) }
         execute { repo.register(name.trim(), email.trim(), password) }
@@ -49,8 +50,11 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
         _state.value = UiState(loading = true)
         viewModelScope.launch {
             _state.value = try {
-                block()
+                // Chốt chặn khi mất mạng: Firebase có thể không trả lời, loading vẫn phải dừng.
+                withTimeout(TIMEOUT_MS) { block() }
                 UiState(success = true)
+            } catch (e: TimeoutCancellationException) {
+                UiState(error = "Máy chủ phản hồi quá lâu, kiểm tra mạng rồi thử lại")
             } catch (e: Exception) {
                 UiState(error = e.toUserMessage())
             }
@@ -58,6 +62,8 @@ class AuthViewModel(private val repo: AuthRepository) : ViewModel() {
     }
 
     companion object {
+        const val TIMEOUT_MS = 20_000L
+
         private val EMAIL = Regex("^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$")
 
         fun validateEmail(email: String): String? =

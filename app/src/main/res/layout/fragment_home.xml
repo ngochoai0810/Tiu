@@ -99,9 +99,10 @@
             android:textColor="@color/tiu_text_secondary" />
     </LinearLayout>
 
-    <ScrollView
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="0dp"
+        android:fillViewport="true"
         android:layout_marginTop="16dp"
         android:clipToPadding="false"
         android:paddingBottom="80dp"
@@ -331,6 +332,6 @@
             </LinearLayout>
 
         </LinearLayout>
-    </ScrollView>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>

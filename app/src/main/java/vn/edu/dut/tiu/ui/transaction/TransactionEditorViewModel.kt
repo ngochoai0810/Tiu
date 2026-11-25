@@ -179,7 +179,8 @@ class TransactionEditorViewModel(
             val uploadedImageUrl = if (s.imageUri != null && (s.imageUri.startsWith("content://") || s.imageUri.startsWith("file://"))) {
                 _state.update { it.copy(isUploadingImage = true) }
                 try {
-                    uploadImageToStorage(s.imageUri)
+                    // Giải mã + nén ảnh nặng -> chạy nền để không đứng giao diện (ANR).
+                    withContext(Dispatchers.IO) { uploadImageToStorage(s.imageUri) }
                 } catch (e: Exception) {
                     _events.send(Event.Error("Lỗi tải ảnh lên: ${e.toUserMessage()}"))
                     _state.update { it.copy(isSaving = false, isUploadingImage = false) }

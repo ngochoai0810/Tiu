@@ -96,7 +96,7 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:autofillHints="newPassword"
-                android:hint="Từ 6 đến 8 ký tự"
+                android:hint="Tối thiểu 6 ký tự"
                 android:inputType="textPassword" />
 
             <TextView

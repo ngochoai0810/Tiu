@@ -27,7 +27,7 @@ class SearchViewModel(
             if (query.isBlank()) {
                 kotlinx.coroutines.flow.flowOf(emptyList())
             } else {
-                val lowerQuery = query.lowercase().trim()
+                val lowerQuery = fold(query.trim())
                 
                 // Get month range (can be optimized to query multiple months or all)
                 val currentMonth = java.time.YearMonth.from(today())
@@ -37,8 +37,8 @@ class SearchViewModel(
                     categoryRepo.observeCategories()
                 ) { txs, cats ->
                     val filteredTxs = txs.filter {
-                        it.note.lowercase().contains(lowerQuery) ||
-                        it.categoryName.lowercase().contains(lowerQuery)
+                        fold(it.note).contains(lowerQuery) ||
+                        fold(it.categoryName).contains(lowerQuery)
                     }
 
                     HomeViewModel.groupByDay(
@@ -53,5 +53,13 @@ class SearchViewModel(
 
     fun search(query: String) {
         queryFlow.value = query
+    }
+
+    companion object {
+        /** "Cà Phê Đá" -> "ca phe da": tìm kiếm không phân biệt hoa/thường và dấu tiếng Việt. */
+        fun fold(text: String): String = java.text.Normalizer.normalize(text, java.text.Normalizer.Form.NFD)
+            .replace(Regex("\\p{M}+"), "")
+            .replace('đ', 'd').replace('Đ', 'D')
+            .lowercase()
     }
 }
